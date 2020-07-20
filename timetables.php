@@ -30,6 +30,7 @@ class timetables extends frontControllerApplication
 			'calendarName' => NULL,
 			'apiUsername'			=> false,		// Optional API access
 			'itemCaseSensitive' => true,
+			'tabUlClass' => 'tabsflat',
 		);
 		
 		# Return the defaults
@@ -1768,7 +1769,7 @@ class timetables extends frontControllerApplication
 		# Load into tabs
 		require_once ('jquery.php');
 		$jQuery = new jQuery (false, false, false, true);
-		$jQuery->tabs ($labels, $panes);
+		$jQuery->tabs ($labels, $panes, 0, false, false, $tabsClass = 'tabsflat');
 		$html .= $jQuery->getHtml ();
 		
 		# Return the HTML
@@ -3052,7 +3053,7 @@ class timetables extends frontControllerApplication
 		$html .= $this->minisearch ($what);
 		
 		# Compile the HTML
-		$html .= application::htmlUl ($actions, 0, 'crudlist tabs', true, false, false, $liClass = true, $action);
+		$html .= application::htmlUl ($actions, 0, 'crudlist tabsflat', true, false, false, $liClass = true, $action);
 		
 		# Return the HTML
 		return $html;
