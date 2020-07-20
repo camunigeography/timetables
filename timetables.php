@@ -1607,7 +1607,8 @@ class timetables extends frontControllerApplication
 				UNIX_TIMESTAMP(bookings.createdAt) as createdAt,
 				rooms.name AS roomName,
 				rooms.moniker AS roomMoniker,
-				buildings.name AS buildingName
+				buildings.name AS buildingName,
+				url
 			FROM bookings
 			LEFT JOIN people ON bookings.bookedForUserid = people.id
 			LEFT JOIN people AS peopleBookedBy ON bookings.bookedByUserid = peopleBookedBy.id
@@ -2228,7 +2229,8 @@ class timetables extends frontControllerApplication
 		$name .= ($booking['activityNamePrefix'] ? ' (' . $booking['activityNamePrefix'] . ')' : '');
 		$editLink = ($this->userIsEditor ? "<a href=\"{$link}edit.html\"><img src=\"/images/icons/pencil.png\" alt=\"\" title=\"Edit this booking\" /></a> " : '');
 		$cloneLink = ($this->userIsEditor ? "<a href=\"{$link}clone.html\"><img src=\"/images/icons/page_copy.png\" alt=\"\" title=\"Clone this booking\" /></a> " : '');
-		$lines['name'] = sprintf ('<h5' . ($isOverlapMessage ? ' class="overlap"' : '') . '>%s<a href="%s">%s</a></h5>', $editLink . $cloneLink, $link, $name);
+		$webLink = ($booking['url'] ? "<a href=\"" . htmlspecialchars ($booking['url']) . "\" target=\"_blank\" class=\"noarrow\"><img src=\"/images/icons/world.png\" alt=\"\" title=\"Go to webpage for this booking\" /></a> " : '');
+		$lines['name'] = sprintf ('<h5' . ($isOverlapMessage ? ' class="overlap"' : '') . '>%s<a href="%s">%s</a></h5>', $editLink . $cloneLink . $webLink, $link, $name);
 		
 		# Add the activity
 		$lines[] = "<p class=\"activity\"><a href=\"{$this->baseUrl}/activities/" . htmlspecialchars (urlencode ($booking['activityMoniker'])) . '/">' . htmlspecialchars ($booking['activityName']) . '</a></p>';
