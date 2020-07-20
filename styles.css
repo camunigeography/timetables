@@ -1,0 +1,73 @@
+#timetables h3.weekcommencing {margin-top: 2em; font-size: 1.1em; padding: 0;}
+#timetables div.expandable {margin-top: 1.5em;}
+#timetables div.expandable h3 {margin-top: 0.2em;}
+#timetables div.expandable p.editorlink {position: absolute; left: 45em;}
+#timetables div.datefilter {margin-top: 20px; padding: 1px 10px; border-top: 1px solid #eee; width: 33em; margin-left: auto; /* i.e. align (not float) it right */ position: relative; top: 1.2em;}
+#timetables div.datefilter + ul#switchabletabs {margin-top: 0;}
+#timetables .home h3.weekcommencing {clear: right;}
+#timetables div.datefilter span.success {color: green;}
+#timetables p#userhasdrafts {float: left;}	/* There is guaranteed to be a datefilter box since the user is signed in */
+/* Grid - based on http://www.alistapart.com/articles/fauxabsolutepositioning/ */
+#timetables #grid .week {width: auto; overflow: auto; padding: 1px; background-color: #603;}
+#timetables #grid .week img {display: block;}
+#timetables #grid .week .day {float: left; width: 100%; /* Height is set in the HTML as it is settings-based */ display: block; position: relative; background-color: white; border-bottom: 1px solid #603;}
+#timetables #grid .week .day:last-child {border-bottom: 0;}
+#timetables #grid .week .day:nth-child(even) {background-color: #fafafa;}	/* Stripe each line */
+#timetables #grid .week .day ul {margin: 0; padding: 0;}
+#timetables #grid .week .day ul li, #timetables #grid .week .day h4 {margin: 0; padding: 0; position: relative; float: left; overflow: hidden; left: 100%; height: 100%;}
+#timetables #grid .week .day h4 {font-size: 0.9em;}
+#timetables #grid .week .day ul.bookings {padding-top: 22px;}
+#timetables #grid .week .day ul.bookings li div {overflow: hidden; margin: 0px 2px 5px 2px; padding: 2px 6px; border: 1px solid gray; height: 75px; border-color: #555 #ccc #ccc #555; background-color: #e7e7e7;}
+#timetables #grid .week .day ul.bookings li div:hover {background-color: #f7f7f7;}
+#timetables #grid .week .day ul.bookings li.draft div {border-style: dashed; border-color: #222 #aaa #aaa #222; /* Slightly darker borders as dashed makes borders less clear */}
+#timetables p span.draft {border: 1px dashed #555; padding: 1px 2px;}
+#timetables #grid .week .day ul.bookings li.highlighted div, #timetables span.highlighted {background-color: #cc99cc;}
+#timetables #grid .week .day ul.bookings li h5, #timetables #grid .week .day ul.bookings li p {font-style: normal; margin: 0; padding: 0; font-size: 0.83em; width: 1000px; /* i.e. prevent wrapping */ overflow: hidden;}
+#timetables .week .day ul.bookings li p, #timetables .week .day ul.bookings li p a {color: #333;}
+#timetables #grid .week .day ul.bookings li h5.overlap a {color: blue;}
+#timetables #grid .week .day ul.bookings li h5 img {display: inline; border: 0; height: 10px; width: 10px;}
+#timetables #grid .week .day h4 {font-style: normal; color: #669; margin-left: -100%; width: 9.5%;}
+#timetables #grid .week .day h4 div {border: 0; padding: 0; margin: 5px; background-color: transparent;}
+#timetables #grid .week .day h4 div a {color: #669;}
+#timetables #grid .week .day.past h4 {opacity: 0.5;}
+#timetables #grid .week .day.past h4 {filter: alpha(opacity=50); -moz-opacity: 0.5; -khtml-opacity: 0.5;}	/* Vendor-specific hacks */
+#timetables #grid .week .day.today h4 div a {color: brown;}
+#timetables #grid .week .day.specialdate h4 div span {color: brown;}
+#timetables #grid .week .day span.customweekindicator {display: block; border: 2px solid red; padding: 2px;}
+#timetables #grid .week .day ul.timeslots li {height: 60px; border-left: 1px solid #eee; color: #bbb; font-size: 0.82em;}
+#timetables #grid .week .day ul.timeslots li div {padding: 4px;}
+#timetables #grid .week .day ul.timeslots li div a {color: #ddd; border: 1px solid #ddd; padding: 0 3px;}
+#timetables #grid .week .day ul.timeslots li div a:hover {text-decoration: none; background-color: #ddd; color: white;}
+#timetables #text .week .day ul.bookings li p {margin: 0; padding: 0;}
+#timetables dl.collapsable {margin: 0;}
+#timetables dl.collapsable dt {font-weight: normal; color: #33c;}
+#timetables dl.collapsable dt {display: inline;}
+#timetables ul.objectlist img.icon {margin-right: 10px;}
+#timetables ul.objectlist li {font-weight: bold;}
+#timetables ul.crudlist li.view, #timetables ul.crudlist li.draft {margin-left: 8px;}
+#timetables h2 span {opacity: 0.8;}
+#timetables h2 span {filter: alpha(opacity=80); -moz-opacity: 0.8; -khtml-opacity: 0.8;}	/* Vendor-specific hacks */
+#timetables form tr.required td {background-color: #f9f9f9;}
+#timetables .ultimateform tr.heading h3 {margin: 6px 0 0;}
+#timetables .ultimateform tr.repeatWeeks td {border-bottom: 0; padding-bottom: 0;}
+#timetables .ultimateform tr.repeatDays td {padding-top: 4px;}
+#timetables .ultimateform tr.repeatDays td.title {color: white;}	/* #!# Hacky way of removing the colon */
+#timetables .ultimateform #form_overrideClash_1:checked + label {color: #603; font-weight: bold;}
+#timetables p.flashmessage {display: inline; font-weight: bold; border: 1px solid green; padding: 4px 10px; border-radius: 6px; background-color: #f7f7f7;}
+#timetables table.datalist th {background-color: #f7f7f7; border-bottom: 1px solid #888;}
+#timetables table.datalist td:first-child {min-width: 85px;}
+#timetables table.datalist td.url {max-width: 100px; overflow: hidden;}
+#timetables .draftslist table tr td:first-child {padding-right: 20px; background-color: #eee; white-space: nowrap;}
+#timetables form.minisearch {float: right; position: relative; top: -4px;}
+#timetables form.minisearch input {font-size: 0.9em;}
+#timetables #switchabletabs-content {margin-bottom: 3em;}
+#timetables {position: relative;}
+#timetables #exporting {position: absolute; top: 7em; right: 0;}
+#timetables #exporting p {line-height: 14px; margin: 0; padding: O;}
+#timetables #exporting img {width: 36px; height: 14px; border: 0; vertical-align: middle; opacity: 0.6;}
+#timetables a.consolidate {color: #ccc; font-size: 0.8em; margin-left: 5px;}
+/* https://css-tricks.com/snippets/css/prevent-long-urls-from-breaking-out-of-container/ */
+#timetables p.icslink {overflow-wrap: break-word; word-wrap: break-word; -ms-word-break: break-all; word-break: break-all; word-break: break-word; -moz-hyphens: auto; -webkit-hyphens: auto; hyphens: auto;}
+@media print {
+	#timetables a[href]:after {content: "";}	/* Disable automatic addition of URLs after each link, which make the page unreadable */
+}

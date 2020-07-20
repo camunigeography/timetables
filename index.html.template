@@ -1,0 +1,14 @@
+<?php
+
+# Define the settings
+$settings = array (
+	'password'				=> 'the_password',
+	'usersAutocomplete'		=> '/path/to/endpoint/data.html?source=local,lookup',
+	'calendarName'			=> 'Widgets',
+);
+
+# Run the application with the specified settings
+require_once ('timetables/timetables.php');
+new timetables ($settings);
+
+?>
