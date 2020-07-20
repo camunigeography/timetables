@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 
 # Class to create an online timetable system
@@ -170,6 +170,13 @@ class timetables extends frontControllerApplication
 				'parent' => 'admin',
 				'usetab' => 'people',
 				'subtab' => 'Consolidate user entries',
+				'privilege' => 'userIsEditor',
+			),
+			'clone' => array (
+				'description' => 'Clone bookings',
+				'url' => 'clone.html',
+				'parent' => 'admin',
+				'subtab' => 'Clone bookings for period',
 				'privilege' => 'userIsEditor',
 			),
 		);
@@ -2272,7 +2279,7 @@ class timetables extends frontControllerApplication
 	public function bookings ()
 	{
 		# Get the activities hierarchy
-		if (!$this->activitiesHierarchy = $this->getActivities (false, false, true, $errorHtml)) {
+		if (!$this->activitiesHierarchy = $this->getActivities (false, false, true, true, $errorHtml)) {
 			echo $errorHtml;
 			return false;
 		}
@@ -2493,7 +2500,7 @@ class timetables extends frontControllerApplication
 		$hideFromNew = ($action != 'list');
 		
 		# Get the activities hierarchy
-		if (!$this->activitiesHierarchy = $this->getActivities (false, false, $hideFromNew, $errorHtml)) {
+		if (!$this->activitiesHierarchy = $this->getActivities (false, false, $hideFromNew, true, $errorHtml)) {
 			echo $errorHtml;
 			return false;
 		}
@@ -3050,7 +3057,7 @@ class timetables extends frontControllerApplication
 	
 	
 	# Function to create a data listing table/export; must be public so that the multisearch resultRenderer can reach it
-	public function dataListing ($data, $table, $additionalHeadings = array (), $exportFormat = false)
+	public function dataListing ($data, $table, $additionalHeadings = array (), $exportFormat = false, $editingLinks = true)
 	{
 		# End if none
 		if (!$data) {return '';}
@@ -3097,12 +3104,14 @@ class timetables extends frontControllerApplication
 		}
 		
 		# Add direct editing links, unless disabled
-		foreach ($data as $key => $entry) {
-			$urlId = (isSet ($entry['moniker']) ? $entry['moniker'] : $key);	// Prefer URL monikers if supplied
-			$data[$key]['View']		= "<a title=\"View\" href=\"{$this->baseUrl}/{$this->action}/{$urlId}/\">" . '<img src="/images/icons/page_white.png" alt="View" class="icon" /></a>';
-			$data[$key]['Edit']		= "<a title=\"Edit\" href=\"{$this->baseUrl}/{$this->action}/{$urlId}/edit.html\">" . '<img src="/images/icons/page_white_edit.png" alt="Edit" class="icon" /></a>';
-			$data[$key]['Duplicate']	= "<a title=\"Duplicate\" href=\"{$this->baseUrl}/{$this->action}/{$urlId}/clone.html\">" . '<img src="/images/icons/page_copy.png" alt="Duplicate" class="icon" /></a>';
-			$data[$key]['Delete']	= "<a title=\"Delete\" href=\"{$this->baseUrl}/{$this->action}/{$urlId}/delete.html\">" . '<img src="/images/icons/page_white_delete.png" alt="Delete" class="icon" /></a>';
+		if ($editingLinks) {
+			foreach ($data as $key => $entry) {
+				$urlId = (isSet ($entry['moniker']) ? $entry['moniker'] : $key);	// Prefer URL monikers if supplied
+				$data[$key]['View']		= "<a title=\"View\" href=\"{$this->baseUrl}/{$this->action}/{$urlId}/\">" . '<img src="/images/icons/page_white.png" alt="View" class="icon" /></a>';
+				$data[$key]['Edit']		= "<a title=\"Edit\" href=\"{$this->baseUrl}/{$this->action}/{$urlId}/edit.html\">" . '<img src="/images/icons/page_white_edit.png" alt="Edit" class="icon" /></a>';
+				$data[$key]['Duplicate']	= "<a title=\"Duplicate\" href=\"{$this->baseUrl}/{$this->action}/{$urlId}/clone.html\">" . '<img src="/images/icons/page_copy.png" alt="Duplicate" class="icon" /></a>';
+				$data[$key]['Delete']	= "<a title=\"Delete\" href=\"{$this->baseUrl}/{$this->action}/{$urlId}/delete.html\">" . '<img src="/images/icons/page_white_delete.png" alt="Delete" class="icon" /></a>';
+			}
 		}
 		
 		# Show the HTML
@@ -4249,7 +4258,7 @@ class timetables extends frontControllerApplication
 	
 	
 	# Helper function to get the activities hierarchy
-	private function getActivities ($id = false, $familyNodeId = false, $hideFromNew = false, &$errorHtml = false)
+	private function getActivities ($id = false, $familyNodeId = false, $hideFromNew = false, $familyNodeIdIncludeAncestors = true, &$errorHtml = false)
 	{
 		# Ensure any supplied ID is numeric
 		if ($id !== false && !ctype_digit ($id)) {return false;}
@@ -4280,8 +4289,12 @@ class timetables extends frontControllerApplication
 			
 			# Define the activities list values
 			#!# Currently there is the problem that if a parent with children is marked has its hideFromNew flag ticked, the children have no parent, resulting in "Error: Not all items in the data have a parent which exists"
-			$hierarchyFunction = ($familyNodeId ? 'getFamily' : 'getHierarchy');
-			if (!$data = $this->hierarchy->{$hierarchyFunction} ($familyNodeId)) {
+			if ($familyNodeId) {
+				$data = $this->hierarchy->getFamily ($familyNodeId, $familyNodeIdIncludeAncestors);
+			} else {
+				$data = $this->hierarchy->getHierarchy ($familyNodeId);
+			}
+			if (!$data) {
 				$errorHtml = 'Error: ' . $this->hierarchy->getError ();
 				return false;
 			}
@@ -4626,6 +4639,271 @@ class timetables extends frontControllerApplication
 		
 		# Return the data
 		return $data;
+	}
+	
+	
+	# Function to clone entries as a batch
+	public function clone ()
+	{
+		# Start the HTML
+		$html = '';
+		
+		# Get the activities hierarchy
+		if (!$this->activitiesHierarchy = $this->getActivities (false, false, true, true, $errorHtml)) {
+			$html .= $errorHtml;
+			echo $html;
+			return false;
+		}
+		
+		# Introduce the page
+		$html .= "\n<p>In this section, you can mass-copy bookings in an area of activity from one time period to another.</p>";
+		$html .= "\n<p>After initially completing the form, you will be shown the new proposed bookings, and then asked to confirm their creation.</p>";
+		
+		# Prevent double-submission of the form; see: https://stackoverflow.com/a/4473801/180733
+		#!# Move into ultimateForm
+		$html .= "\n<script>
+			$(document).ready (function (){
+				$('form').submit(function(){
+					var myForm = $(this);
+					if (myForm.data ('submitted') === true) {
+						e.preventDefault ();
+					} else {
+						myForm.data ('submitted', true);
+					}
+				});
+			});
+		</script>
+		";
+		
+		# Start the form
+		$form = new form (array (
+			'div' => 'lines vertical',
+			'displayRestrictions' => false,
+			'autofocus' => true,
+			'formCompleteText' => false,
+			'reappear' => true,
+			'requiredFieldIndicator' => false,
+			'picker' => true,
+		));
+		
+		# Source bookings
+		$form->heading (3, 'Copy from... (source bookings)');
+		$form->select (array (
+			'name' => 'activityId',
+			'title' => 'Area of activity',
+			'values' => hierarchy::asIndentedListing ($this->activitiesHierarchy),
+			'required' => true,
+			//'multiple' => true,
+			//'size' => 8,
+		));
+		$form->datetime (array (
+		    'name'		=> 'startdate',
+		    'title'		=> 'From start date',
+		    'level'		=> 'date',
+			'required'	=> true,
+		));
+		$form->datetime (array (
+		    'name'		=> 'enddate',
+		    'title'		=> 'Until last date',
+		    'level'		=> 'date',
+			'required'	=> true,
+		));
+		$this->checkStartEndDate ($form);
+		
+		# Target bookings
+		$form->heading (3, 'Copy to... (target bookings)');
+		$form->datetime (array (
+		    'name'		=> 'shiftdate',
+		    'title'		=> 'Start date becomes',
+		    'level'		=> 'date',
+			'required'	=> true,
+		));
+		$form->checkboxes (array (
+			'name'		=> 'draft',
+			'title'		=> 'Set as draft bookings?',
+			'values'	=> array ('draft' => 'Yes, set as draft bookings'),
+			'default'	=> array ('draft'),
+			'output'	=> array ('processing' => 'special-setdatatype'),
+		));
+		
+		# Confirm
+		if ($unfinalisedData = $form->getUnfinalisedData ()) {
+			if (!$form->getElementProblems ()) {
+				$form->heading (3, 'Confirmation');
+				$form->checkboxes (array (
+					'name'		=> 'confirm',
+					'title'		=> 'Confirm?',
+					'values'	=> array ('confirm' => '<strong>Yes, create these new cloned bookings</strong>'),
+					'entities'	=> false,
+					'output'	=> array ('processing' => 'special-setdatatype'),
+				));
+			}
+		}
+		
+		# Process the form
+		if (!$result = $form->process ($html)) {
+			echo $html;
+			return false;
+		}
+		
+		# Spacing
+		$html .= "\n<br />";
+		$html .= "\n<br />";
+		$html .= "\n<hr />";
+		
+		# Get the bookings
+		if (!$bookings = $this->getBookingsActivitiesHierarchyBetween ($result['activityId'], $result['startdate'], $result['enddate'])) {
+			$html .= "\n<p><strong>No bookings matching those criteria were found.</strong></p>";
+			echo $html;
+			return;
+		}
+		
+		# Determine the number of days to add; see: https://stackoverflow.com/a/16177475/180733
+		$earlier = new DateTime ($result['startdate']);
+		$later   = new DateTime ($result['shiftdate']);
+		$days = $earlier->diff ($later)->format ('%r%a');	// %r adds - if negative
+		
+		# Determine the new dates; see: https://stackoverflow.com/a/3727639/180733
+		$newDates = array ();
+		foreach ($bookings as $id => $booking) {
+			$sign = ($days >= 0 ? '+' : '');
+			$newDates[$id] = date ('Y-m-d', strtotime ($booking['date'] . " {$sign}{$days} day"));
+		}
+		
+		# Show differences in the listing, by adding a new column
+		foreach ($bookings as $id => $booking) {
+			$bookings[$id] = application::array_insert_value ($bookings[$id], 'New date', '<span class="warning"><strong>' . $newDates[$id] . '</strong></span>', $afterField = 'date');
+			$bookings[$id]['draft'] = ($result['draft'] ? '<span class="warning"><strong>&#10003;</strong></span>' : '');
+			$bookings[$id]['bookedByUserid'] = '<span class="warning"><strong>' . $this->user . '</strong></span>';
+			$bookings[$id]['updatedByUserid'] = '';
+		}
+		
+		# Show the bookings, with editing links disabled
+		$totalBookings = count ($bookings);
+		$html .= "\n<p><strong>The following shows the {$totalBookings} matching bookings, and the new date. To create the new bookings, tick the confirmation box above and resubmit the form.</strong></p>";
+		$html .= "\n<br />";
+		$html .= $this->dataListing ($bookings, 'bookings', array (), false, $editingLinks = false);
+		
+		# Get the fields in the booking tables, to use in the cloning SQL, and remove automatic fields
+		$bookingsFields = $this->databaseConnection->getFieldnames ($this->settings['database'], 'bookings');
+		$bookingsFields = array_diff ($bookingsFields, array ('id', 'createdAt'));
+		
+		# Determine the fields to clone, i.e. those not being adjusted manually in the query below
+		$adjustedFields = array ('date', 'draft', 'series', 'bookedByUserid', 'updatedByUserid');
+		$cloneFields = array_diff ($bookingsFields, $adjustedFields);
+		$cloneFieldsImploded = implode (', ', $cloneFields);
+		
+		# Determine the booking IDs
+		$bookingIds = array_keys ($bookings);
+		$bookingIdsImploded = implode (', ', $bookingIds);
+		
+		# Series ID adjustment
+		$seriesIdAdjustment = ($days * 24*60*60) * 1000000000;	// I.e. maintain last 9 digits
+		
+		# Do the insert if required
+		if ($result['confirm']) {
+			
+			# Assemble the query
+			# See createSeries for series number handling - seconds + 9-digit-microseconds
+			# The inner and outer CAST for series avoids the addition becoming an exponent; see: https://dba.stackexchange.com/a/28045/83387
+			$query = "
+				INSERT
+				INTO {$this->settings['database']}.bookings ({$cloneFieldsImploded}, date, series, draft, bookedByUserid, updatedByUserid)
+					SELECT
+						{$cloneFieldsImploded},
+						DATE_ADD(`date`, INTERVAL {$days} DAY) AS `date`,
+						IF(ISNULL(series), NULL, CAST(CAST((series + {$seriesIdAdjustment}) AS DECIMAL(30)) AS CHAR)) AS series,
+						" . ($result['draft'] ? '1' : 'NULL') . " AS draft,
+						'{$this->user}' AS bookedByUserid,
+						NULL AS updatedByUserid
+					FROM {$this->settings['database']}.bookings
+					WHERE bookings.id IN({$bookingIdsImploded})
+					ORDER BY date,startTime,id
+			;";
+			
+			# Execute
+			if (!$result = $this->databaseConnection->query ($query)) {
+				application::dumpData ($this->databaseConnection->error ());
+				$html = "\n<p class=\"warning\">A problem occured while trying to add the new bookings. Please contact the Webmaster.</p>";
+				echo $html;
+				return;
+			}
+			
+			# Confirm success, resetting the content
+			$html  = "\n<p>{$this->tick} The {$totalBookings} new bookings have been created.</p>";
+			$html .= "\n<p><a href=\"{$this->baseUrl}/\">Browse the timetable page.</a></p>";
+		}
+		
+		# Show the HTML
+		echo $html;
+	}
+	
+	
+	# Function to get bookings for an activities hierarchy downwards between two dates
+	private function getBookingsActivitiesHierarchyBetween ($activityId, $startDate, $endDate)
+	{
+		# Start a set of constraints
+		$where = array ();
+		$preparedStatementValues = array ();
+		
+		# Get the activity hierarchy from the selected activity downards (not ancestors upwards), and register this list as a constraint
+		$activitiesFamilyIds = $this->getActivities (false, $activityId, $hideFromNew = false, $familyNodeIdIncludeAncestors = false);
+		$activitiesFamilyIdsQuoted = array ();
+		$i = 0;
+		$placeholders = array ();
+		foreach ($activitiesFamilyIds as $activitiesFamilyId => $activity) {
+			$placeholder = "activity{$i}";
+			$preparedStatementValues[$placeholder] = $activitiesFamilyId;
+			$placeholders[] = ':' . $placeholder;
+			$i++;
+		}
+		$where[] = 'areaOfActivityId IN (' . implode (', ', $placeholders) . ')';
+		
+		# Add date constraints
+		$where[] = 'date >= :startDate';
+		$where[] = 'date <= :endDate';
+		$preparedStatementValues['startDate'] = $startDate;
+		$preparedStatementValues['endDate'] = $endDate;
+		
+		# Get the data
+		$table = 'bookings';
+		$query = "SELECT * FROM {$this->settings['database']}.{$table} WHERE " . implode (' AND ', $where) . ' ORDER BY date,startTime,id;';
+		$data = $this->databaseConnection->getData ($query, "{$this->settings['database']}.{$table}", true, $preparedStatementValues);
+		
+		# Return the data
+		return $data;
+	}
+	
+	
+	# Function to check the start and end date
+	private function checkStartEndDate (&$form)
+	{
+		# Ensure both are completed if one is
+		$form->validation ('all', array ('startdate', 'enddate'));
+		
+		# Take the unfinalised data to deal with start/end date comparisons
+		if ($unfinalisedData = $form->getUnfinalisedData ()) {
+			if ($unfinalisedData['Startdate'] && $unfinalisedData['Enddate']) {
+				
+				# Assemble the start & end dates as a number (this would normally be done in ultimateForm in the post-unfinalised data processing section
+				$startDate = (int) str_replace ('-', '', $unfinalisedData['Startdate']);
+				$endDate = (int) str_replace ('-', '', $unfinalisedData['Enddate']);
+				
+				# Check that the start (and thereby the end date) are after the current date
+				if ($startDate < date ('Ymd')) {
+					$form->registerProblem ('datefuture', 'The start/end dates cannot be retrospective. Please go back and correct this.');
+				} else {
+					
+					# Check that the start date comes before the end date; NB the >= seems to work successfully with comparison of strings including the dash (-) character
+					if ($startDate > $endDate) {
+						$form->registerProblem ('datemismatch', 'The end date must be on or after the start date. Please go back and correct this.');
+					}
+				}
+			}
+		}
+		
+		# No return value as the form is passed as a handle
+		return;
 	}
 	
 	

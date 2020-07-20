@@ -54,7 +54,7 @@
 		RewriteRule ^$applicationBaseUrl/(bookings)/([-,0-9]*[0-9])$ $applicationBaseUrl/$1/$2/ [R]
 	# People view
 	# Other pages
-		RewriteRule ^$applicationBaseUrl/(more|maintenance)\.html$ $applicationBaseUrl/index.html?action=$1 [L,QSA]
+		RewriteRule ^$applicationBaseUrl/(more|maintenance|clone)\.html$ $applicationBaseUrl/index.html?action=$1 [L,QSA]
 	# Disable all kinds of access restriction on export files (as calendars cannot do Raven authentication)
 	<LocationMatch "\.ics$">
 		Satisfy Any
