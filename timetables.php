@@ -423,6 +423,7 @@ class timetables extends frontControllerApplication
 		$exportFormats = array (
 			'timetable.ics'	=> 'ics',
 			'export.html'	=> true,
+			'timetable.csv'	=> 'csv',
 		);
 		$this->export = (isSet ($_GET['export']) && strlen ($_GET['export']) && isSet ($exportFormats[$_GET['export']]) ? $exportFormats[$_GET['export']] : false);
 		
@@ -1713,6 +1714,7 @@ class timetables extends frontControllerApplication
 		$formats = array (
 			'grid' => 'Grid view',
 			'text' => 'Text listing',
+			'csv'  => 'Spreadsheet',
 			'ical' => 'Calendar feed (iCal)',
 		);
 		$labels = array ();
@@ -1725,7 +1727,7 @@ class timetables extends frontControllerApplication
 			# Start the pane
 			$panes[$format] = '';
 			
-			# iCal - show a box
+			# iCal - show an export box
 			if ($format == 'ical') {
 				
 				# Link, top-right
@@ -1734,6 +1736,18 @@ class timetables extends frontControllerApplication
 				$html .= "\n</div>";
 				
 				$panes[$format] .= $this->exportingPage ();
+				
+				continue;
+			}
+			
+			# CSV - show an export box
+			if ($format == 'csv') {
+				
+				# Link, top-right
+				$panes[$format] .= "\n<h3>Download bookings as a spreadsheet</h3>";
+				$panes[$format] .= "\n<p>You can download all bookings in this section, from today onwards, below.</p>";
+				$panes[$format] .= "\n<br />";
+				$panes[$format] .= "\n<p><a class=\"actions\" rel=\"nofollow\" href=\"{$_SERVER['SCRIPT_URL']}timetable.csv\"><img src=\"/images/icons/page_excel.png\" alt=\"Spreadsheet\" /> Download bookings as a spreadsheet (CSV file)</a></p>";
 				
 				continue;
 			}
@@ -1834,7 +1848,66 @@ class timetables extends frontControllerApplication
 		require_once ('ical.php');
 		$ical = new ical ();
 		$title = ($title ? $title . ' - ' : '') . $this->settings['calendarName'];
-		return $text = $ical->create ($events, $title, 'ac.uk.cam.geog', 'Timetable');
+		$icalString = $ical->create ($events, $title, 'ac.uk.cam.geog', 'Timetable');
+		
+		# Return the data; this is then served with output buffering
+		return $icalString;
+	}
+	
+	
+	# Function to implement the export of bookings as CSV
+	private function exportBookingsCsv ($bookings, $title = false)
+	{
+		# Order by start time
+		usort ($bookings, function ($a, $b) {
+			return strcmp ($a['startTime'], $b['startTime']);
+		});
+		
+		# Remove unwanted fields, if present; each aspect (room, people) will have different fields, so it is not practical to whitelist fields, only remove unwanted
+		$unwantedFields = array (
+			'startTime',	// Unixtime; startTimeFormatted is human-readable
+			'untilTime',	// Unixtime; untilTimeFormatted is human-readable
+			'activityId',
+			
+		);
+		foreach ($bookings as $index => $booking) {
+			foreach ($unwantedFields as $unwantedField) {
+				if (array_key_exists ($unwantedField, $bookings[$index])) {
+					unset ($bookings[$index][$unwantedField]);
+				}
+			}
+		}
+		
+		# Clear HTML, e.g. in bookedForUserid
+		foreach ($bookings as $index => $booking) {
+			foreach ($booking as $key => $value) {
+				$bookings[$index][$key] = strip_tags ($value);
+			}
+		}
+		
+		# Format specific fields
+		foreach ($bookings as $index => $booking) {
+			foreach ($booking as $key => $value) {
+				if ($key == 'createdAt') {
+					$bookings[$index][$key] = date ('r', $value);
+				}
+			}
+		}
+		
+		# Convert the bookings to CSV
+		require_once ('csv.php');
+		$csv = csv::dataToCsv ($bookings);
+		
+		# Set the filename base
+		$filenameBase  = 'timetable_' . $_GET['action'] . '_' . $_GET['id'];
+		$filenameBase .= '_savedAt' . date ('Ymd-His');
+		
+		# Publish, by sending a header and then echoing the data
+		header ('Content-type: application/octet-stream');
+		header ('Content-Disposition: attachment; filename="' . $filenameBase . '.csv"');
+		
+		# Return the data; this is then served with output buffering
+		return $csv;
 	}
 	
 	
