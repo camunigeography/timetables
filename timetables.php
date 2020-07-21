@@ -649,10 +649,13 @@ class timetables extends frontControllerApplication
 		# Start the HTML
 		$html = '';
 		
-		# If a reset is requested, reset the profile dates, and refresh the page to prevent ?reset staying in the URL
-		if ($_SERVER['QUERY_STRING'] == 'reset') {
+		# If a reset is requested, reset the profile dates, and refresh the page to prevent /reset.html staying in the URL
+		#!# /reset.html always resets to the top-level of the system; it should instead be to the current view, e.g. /rooms/reception/reset.html
+		if (isSet ($_GET['reset']) && $_GET['reset'] == '1') {
 			$this->saveImplicitViewDates ($this->defaultDateState['startDate'], $this->defaultDateState['weeksAhead']);
-			$html = application::sendHeader (302, $_SERVER['_SITE_URL'] . $_SERVER['SCRIPT_NAME'], $redirectMessage = true);
+			$url = $_SERVER['_SITE_URL'] . $_SERVER['SCRIPT_NAME'];
+			$url = preg_replace ('|/reset.html$|', '/', $url);
+			$html = application::sendHeader (302, $url, $redirectMessage = true);
 			return $html;
 		}
 		
@@ -664,7 +667,7 @@ class timetables extends frontControllerApplication
 		
 		# Create a form
 		#!# Replace spaces with CSS
-		$clearanceHtml = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;or&nbsp;<a class="small" href="' . $this->baseUrl . '/?reset' . '">reset</a></p>';
+		$clearanceHtml = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;or&nbsp;<a class="small" href="' . $this->baseUrl . '/reset.html' . '">reset</a></p>';
 		$form = new form (array (
 			'displayRestrictions' => false,
 			'name' => 'datefilter',

@@ -9,6 +9,7 @@
 	# Timetable viewing URLs
 		# Browse/'My' timetable
 			RewriteRule ^$applicationBaseUrl/(|timetable.ics|export.html|timetable.csv)$ $applicationBaseUrl/index.html?export=$1 [L,QSA]
+			RewriteRule ^$applicationBaseUrl/reset.html$ $applicationBaseUrl/index.html?reset=1 [L,QSA]
 			RewriteRule ^$applicationBaseUrl/(browse|my|today)/(|timetable.ics|export.html|timetable.csv)$ $applicationBaseUrl/index.html?action=$1&export=$2 [L,QSA]
 			RewriteRule ^$applicationBaseUrl/(browse|my|today)$ $applicationBaseUrl/$1/ [R]
 		# Natural dates; these may have an optional /type/id/ prefix, e.g. /activities/2/2012/, using this optional regexp block: ((activities|people|rooms)/([a-zA-Z0-9]+)/)?
