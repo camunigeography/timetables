@@ -684,7 +684,6 @@ class timetables extends frontControllerApplication
 			'title'			=> 'Start date',
 			'required' 		=> true,
 			'default'		=> $this->userProfile['startDate'],
-			'pickerAutosubmit' => true,
 		));
 		$form->select (array (
 			'name' => 'weeksAhead',
