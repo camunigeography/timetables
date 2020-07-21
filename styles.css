@@ -6,7 +6,6 @@
 #timetables div.datefilter + ul#switchabletabs {margin-top: 0;}
 #timetables .home h3.weekcommencing {clear: right;}
 #timetables div.datefilter span.success {color: green;}
-#timetables p#userhasdrafts {float: left;}	/* There is guaranteed to be a datefilter box since the user is signed in */
 /* Grid - based on http://www.alistapart.com/articles/fauxabsolutepositioning/ */
 #timetables #grid .week {width: auto; overflow: auto; padding: 1px; background-color: #603;}
 #timetables #grid .week img {display: block;}

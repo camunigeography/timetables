@@ -1700,9 +1700,7 @@ class timetables extends frontControllerApplication
 		
 		# If any are draft, state this
 		if ($this->userIsEditor) {
-			if ($hasDrafts = $this->hasDrafts ($bookings)) {
-				$html .= "\n<p id=\"userhasdrafts\">Note: The listing below has some items which are <span class=\"draft\">not yet public</span>." . (isSet ($hasDrafts[$this->user]) ? "<br />Please <a href=\"{$this->baseUrl}/bookings/draft.html\">set your draft bookings as public</a> when you are ready." : '') . '</p>';
-			}
+			$hasDrafts = $this->hasDrafts ($bookings);
 		}
 		
 		# Determine if we are viewing custom week(s) that need edge chopping
@@ -1731,6 +1729,12 @@ class timetables extends frontControllerApplication
 			
 			# Start the pane
 			$panes[$format] = '';
+			
+			# In grid and text modes, show drafts warning
+			$draftsWarningFormats = array ('grid');
+			if (in_array ($format, $draftsWarningFormats)) {
+				$panes[$format] .= "\n<p>Note: The listing below has some items which are <span class=\"draft\">not yet public</span>." . (isSet ($hasDrafts[$this->user]) ? "<br />Please <a href=\"{$this->baseUrl}/bookings/draft.html\">set your draft bookings as public</a> when you are ready." : '') . '</p>';
+			}
 			
 			# iCal - show an export box
 			if ($format == 'ical') {
