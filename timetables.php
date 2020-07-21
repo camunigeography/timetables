@@ -99,6 +99,13 @@ class timetables extends frontControllerApplication
 				'descriptionSingular' => 'person',
 				//'privilege' - this is done in the function logic as it must be limited only to editing
 			),
+			'editors' => array (
+				'description' => 'Editors',
+				'url' => 'editors/',
+				'tab' => 'Editors',
+				'icon' => 'shield',
+				// 'administrator' => true, - actually we should allow Editors to add new Editors
+			),
 			'more' => array (
 				'description' => 'More&hellip;',
 				'url' => 'more.html',
@@ -122,14 +129,6 @@ class timetables extends frontControllerApplication
 				'icon' => 'shape_move_back',
 				'privilege' => 'userIsEditor',
 				'table' => 'eventTypes',
-			),
-			'editors' => array (
-				'description' => 'Editors',
-				'url' => 'editors/',
-				// 'parent' => 'more',
-				'tab' => 'Editors',
-				'icon' => 'shield',
-				// 'administrator' => true, - actually we should allow Editors to add new Editors
 			),
 			'terms' => array (
 				'description' => 'Term dates',
