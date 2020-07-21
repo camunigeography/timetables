@@ -37,6 +37,10 @@
 #timetables #grid .week .day ul.timeslots li div {padding: 4px;}
 #timetables #grid .week .day ul.timeslots li div a {color: #ddd; border: 1px solid #ddd; padding: 0 3px;}
 #timetables #grid .week .day ul.timeslots li div a:hover {text-decoration: none; background-color: #ddd; color: white;}
+/* Text layout */
+#timetables #text .week .day {margin-top: 2.5em;}
+#timetables #text .week .day ul.bookings, #timetables #text .week .day ul.bookings li {list-style: none; margin-left: 0; padding-left: 0;}
+#timetables #text .week .day ul.bookings li {background-color: #eee; width: 400px; padding: 10px; margin-bottom: 10px;}
 #timetables #text .week .day ul.bookings li p {margin: 0; padding: 0;}
 #timetables dl.collapsable {margin: 0;}
 #timetables dl.collapsable dt {font-weight: normal; color: #33c;}
