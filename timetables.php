@@ -3970,12 +3970,14 @@ class timetables extends frontControllerApplication
 			
 			# Add repetition fields (except in request mode)
 			if (!$requestMode) {
-				$form->input (array (
+				$form->number (array (
 					'name'			=> 'repeatWeeks',
 					'after'			=> 'untilTime',
 					'title'			=> 'Repeat?',
 					'maxlength'		=> 2,
 					'size'			=> 4,
+					'min'			=> 1,
+					'max'			=> 52,
 					'prepend'		=> 'for the following ',
 					'append'		=> ' weeks, on:',
 				));
