@@ -1451,6 +1451,7 @@ class timetables extends frontControllerApplication
 		
 		# Create as a hierarchy
 		$html .= "\n<p><strong>Click on an area of activity to view the bookings relevant to it.</strong></p>";
+		$html .= "\n<p>Those areas of activity shown <span class=\"comment\">grayed out</span> are marked as older types not available for new bookings.</p>";
 		if ($this->userIsEditor && $editorsSeeLinks) {
 			$html .= "\n<p>As an Editor, you can click on the [edit] link to edit its details, or [+] to add a new area of activity within that item.</p>";
 		}
