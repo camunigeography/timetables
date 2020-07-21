@@ -2393,7 +2393,7 @@ class timetables extends frontControllerApplication
 				'roomId' => array ('values' => $rooms, ),
 				#!# Date bug that /12 as year becomes 0012
 				'date' => array_merge (array ('heading' => array (3 => 'Dates and times'), ), $this->datePickerAttributes ()),
-				'url' => array ('heading' => array (3 => 'Other details'), ),
+				'url' => array ('heading' => array (3 => 'Other details'), 'size' => 60, 'placeholder' => 'https://...', 'description' => false, ),
 				'notes' => array ('rows' => 2, 'cols' => 40, ),
 				'hideFromDisplayBoard' => array ('title' => "Hide from <a href=\"{$this->baseUrl}/today/\" target=\"_blank\" title=\"[Link opens in a new window]\">display board listing</a>?"),
 				'bookedByUserid'  => ($this->settings['usersAutocomplete'] ? array ('autocomplete' => $this->settings['usersAutocomplete'], 'autocompleteOptions' => array ('delay' => 0), 'description' => 'Type a surname or username; one person per line only', ) : array ()),	// Will only take effect when visible, i.e. on the search page
