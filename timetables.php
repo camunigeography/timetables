@@ -10,24 +10,21 @@ class timetables extends frontControllerApplication
 	{
 		# Specify available arguments as defaults or as NULL (to represent a required argument)
 		$defaults = array (
+			'div' => strtolower (__CLASS__),
 			'database' => 'timetables',
 			'username' => 'timetables',
 			'password' => NULL,
 			'table' => false,
-			'administrators' => true,
-			'div' => strtolower (__CLASS__),
-			'termLabels' => array (),
-			'usersAutocomplete' => false,
-			'usersExternalDatabase' => false,	// Must contain fields username,title,forename,surname
-			'usersExternalUrl' => false,		// Where that datasource can be edited
 			'databaseStrictWhere' => true,
+			'administrators' => true,
+			'termLabels' => array (),
+			'usersExternalDatabase' => false,	// Must contain fields username,title,forename,surname
 			'dayHeightPx' => 112,
 			'overlapPx' => 44,
 			'jQuery' => true,
 			'usernameRegexp' => '^([a-z]{2,6})([1-9])([0-9]{0,4})$',	// Regexp (must be compatible with both MySQL and with PHP's preg_match function) of a real username
 			'daterangeCookieName' => 'daterange',
 			'daterangeCookieSeparator' => ';',
-			'calendarName' => NULL,
 			'apiUsername'			=> false,		// Optional API access
 			'itemCaseSensitive' => true,
 			'tabUlClass' => 'tabsflat',
@@ -327,6 +324,9 @@ class timetables extends frontControllerApplication
 			  `filteringControlWeeksAheadDefault` int(2) NOT NULL DEFAULT '8' COMMENT 'For the filtering box, the default number of weeks ahead selectable',
 			  `paginationRecordsPerPage` int(3) NOT NULL DEFAULT '25' COMMENT 'Pagination records per page',
 			  `institutionDescription` VARCHAR(255) NOT NULL DEFAULT 'Department' COMMENT 'Institution description',
+			  `usersAutocomplete` VARCHAR(255) NULL COMMENT 'Users autocomplete URL',
+			  `usersExternalUrl` VARCHAR(255) NULL COMMENT 'Users database UI external URL',
+			  `calendarName` VARCHAR(255) NOT NULL DEFAULT 'calendar' COMMENT 'iCal calendar name',
 			  PRIMARY KEY (`id`)
 			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Settings';
 			
