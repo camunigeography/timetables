@@ -3,7 +3,7 @@
 <Macro MacroTimetables $applicationBaseUrl $description>
 	Use MacroFrontControllerApplication "$applicationBaseUrl/" "$description"
 	<Location $applicationBaseUrl/>
-		php_value output_buffering 32768
+		php_value output_buffering 65536
 	</Location>
 	RewriteEngine on
 	# Timetable viewing URLs
