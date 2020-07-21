@@ -40,8 +40,9 @@
 /* Text layout */
 #timetables #text .week .day {margin-top: 2.5em;}
 #timetables #text .week .day ul.bookings, #timetables #text .week .day ul.bookings li {list-style: none; margin-left: 0; padding-left: 0;}
-#timetables #text .week .day ul.bookings li {background-color: #eee; width: 400px; padding: 10px; margin-bottom: 10px;}
+#timetables #text .week .day ul.bookings li {background-color: #eee; width: 400px; padding: 10px; margin-bottom: 10px; border: 1px solid gray; border-color: #555 #ccc #ccc #555;}
 #timetables #text .week .day ul.bookings li p {margin: 0; padding: 0;}
+#timetables #text .week .day ul.bookings li.draft {border-style: dashed; border-width: 1px; border-color: #222 #aaa #aaa #222; /* Slightly darker borders as dashed makes borders less clear */}
 #timetables dl.collapsable {margin: 0;}
 #timetables dl.collapsable dt {font-weight: normal; color: #33c;}
 #timetables dl.collapsable dt {display: inline;}

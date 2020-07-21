@@ -1731,7 +1731,7 @@ class timetables extends frontControllerApplication
 			$panes[$format] = '';
 			
 			# In grid and text modes, show drafts warning
-			$draftsWarningFormats = array ('grid');
+			$draftsWarningFormats = array ('grid', 'text');
 			if (in_array ($format, $draftsWarningFormats)) {
 				$panes[$format] .= "\n<p>Note: The listing below has some items which are <span class=\"draft\">not yet public</span>." . (isSet ($hasDrafts[$this->user]) ? "<br />Please <a href=\"{$this->baseUrl}/bookings/draft.html\">set your draft bookings as public</a> when you are ready." : '') . '</p>';
 			}
