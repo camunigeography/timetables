@@ -3084,8 +3084,9 @@ class timetables extends frontControllerApplication
 		$paginate = ($this->action == 'bookings');
 		
 		# Determine if this is an export type
+		#!# Need to merge the 'exportall' system with the main 'export' system
 		$supportedFormats = array ('csv');
-		$exportFormat = (isSet ($_GET['export']) && in_array ($_GET['export'], $supportedFormats) ? $_GET['export'] : false);
+		$exportFormat = (isSet ($_GET['exportall']) && in_array ($_GET['exportall'], $supportedFormats) ? $_GET['exportall'] : false);
 		if ($exportFormat) {
 			$paginate = false;
 		}

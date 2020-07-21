@@ -42,11 +42,12 @@
 		RewriteRule ^$applicationBaseUrl/(bookings)/(request).html $applicationBaseUrl/index.html?action=$1&do=$2 [L,QSA]
 	# Generic CRUD operations on most data structure types, though main objects have the timetable listing for the List view
 		RewriteRule ^$applicationBaseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|activities|people|rooms)/$ $applicationBaseUrl/index.html?action=$1&do=list [L,QSA]
-		RewriteRule ^$applicationBaseUrl/(bookings)/\1.(csv)$ $applicationBaseUrl/index.html?action=$1&do=list&export=$2 [L,QSA]
+		RewriteRule ^$applicationBaseUrl/(bookings)/\1.(csv)$ $applicationBaseUrl/index.html?action=$1&do=list&exportall=$2 [L,QSA]
 		RewriteRule ^$applicationBaseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|activities|people|rooms)$ $applicationBaseUrl/$1/ [R]
 		RewriteRule ^$applicationBaseUrl/(people)/all.html$ $applicationBaseUrl/index.html?action=$1&do=list&mode=all [L,QSA]
 		RewriteRule ^$applicationBaseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|activities|people|rooms)/(add|search)\.html$ $applicationBaseUrl/index.html?action=$1&do=$2 [L,QSA]
-		RewriteRule ^$applicationBaseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|activities|people|rooms)/(search)\.csv$ $applicationBaseUrl/index.html?action=$1&do=$2export=$3 [L,QSA]
+		#!# Not clear this exportall is actually in use
+		RewriteRule ^$applicationBaseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|activities|people|rooms)/(search)\.(csv)$ $applicationBaseUrl/index.html?action=$1&do=$2exportall=$3 [L,QSA]
 		RewriteRule ^$applicationBaseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|activities|people|rooms)/([^/]+)/(|timetable.ics|export.html|timetable.csv)$ $applicationBaseUrl/index.html?action=$1&id=$2&do=view&export=$3 [L,QSA]
 		RewriteRule ^$applicationBaseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|activities|people|rooms)/([^/]+)$ $applicationBaseUrl/$1/$2/ [R]
 		RewriteRule ^$applicationBaseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|activities|people|rooms)/([^/]+)/(delete|edit|clone).html$ $applicationBaseUrl/index.html?action=$1&id=$2&do=$3 [L,QSA]
