@@ -148,10 +148,11 @@ class timetables extends frontControllerApplication
 				'table' => 'specialDates',
 			),
 			'today' => array (
-				'description' => false,
+				'description' => 'Lobby screen page',
 				'url' => 'today/',
 				'parent' => 'more',
-				'subtab' => 'Today',
+				'subtab' => 'Lobby screen page',
+				'icon' => 'picture_empty',
 				'export' => true,
 			),
 			'maintenance' => array (
@@ -2334,9 +2335,21 @@ class timetables extends frontControllerApplication
 		# Combine
 		$actions = array_merge ($mainObjectActions, $otherObjectActions);
 		
+		# Split out standalone pages
+		$standalonePages = array ('today');
+		$otherPages = application::array_filter_keys ($actions, $standalonePages);
+		foreach ($standalonePages as $standalonePage) {
+			unset ($actions[$standalonePage]);
+		}
+		
 		# Compile the HTML, adding a heading
 		$html  = "\n<p>You can edit these kinds of items:</p>";
 		$html .= $this->actionsListHtml ($actions, true, 'boxylist objectlist');
+		
+		# Other pages
+		$html .= "\n<p>Other pages:</p>";
+		$html .= $this->actionsListHtml ($otherPages, true, 'boxylist objectlist');
+		
 		
 		# Show the HTML
 		echo $html;
