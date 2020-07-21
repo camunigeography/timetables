@@ -3105,6 +3105,10 @@ class timetables extends frontControllerApplication
 			$data = $this->databaseConnection->select ($this->settings['database'], $table, array (), array (), true, $orderBy = 'id');
 		}
 		
+		# Convert booleans to ticks
+		$fields = $this->databaseConnection->getFields ($this->settings['database'], $table);
+		$data = application::booleansToTicks ($data, $fields);
+		
 		# Look up the description for this action type
 		$description = strtolower ($this->actions[$this->action]['description']);
 		
