@@ -3109,6 +3109,9 @@ class timetables extends frontControllerApplication
 		$fields = $this->databaseConnection->getFields ($this->settings['database'], $table);
 		$data = application::booleansToTicks ($data, $fields);
 		
+		# Convert times to be more human-readable
+		$data = $this->simplifyTimes ($data);
+		
 		# Look up the description for this action type
 		$description = strtolower ($this->actions[$this->action]['description']);
 		
@@ -3144,6 +3147,24 @@ class timetables extends frontControllerApplication
 		
 		# Return the HTML
 		return $html;
+	}
+	
+	
+	# Function to convert times to be more human-readable, e.g. '09:00:00' becomes '9am'
+	private function simplifyTimes ($data)
+	{
+		# Convert each field
+		require_once ('timedate.php');
+		foreach ($data as $index => $record) {
+			foreach ($record as $field => $value) {
+				if (preg_match ('/time$/i', $field)) {
+					$data[$index][$field] = timedate::simplifyTime ($value, true);
+				}
+			}
+		}
+		
+		# Return the data
+		return $data;
 	}
 	
 	
