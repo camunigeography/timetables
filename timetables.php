@@ -2251,8 +2251,9 @@ class timetables extends frontControllerApplication
 		$name .= ($booking['activityNamePrefix'] ? ' (' . $booking['activityNamePrefix'] . ')' : '');
 		$editLink = ($this->userIsEditor ? "<a href=\"{$link}edit.html\"><img src=\"/images/icons/pencil.png\" alt=\"\" title=\"Edit this booking\" /></a> " : '');
 		$cloneLink = ($this->userIsEditor ? "<a href=\"{$link}clone.html\"><img src=\"/images/icons/page_copy.png\" alt=\"\" title=\"Clone this booking\" /></a> " : '');
+		$deleteLink = ($this->userIsEditor ? "<a href=\"{$link}delete.html\"><img src=\"/images/icons/page_white_delete.png\" alt=\"\" title=\"Delete this booking\" /></a> " : '');
 		$webLink = ($booking['url'] ? "<a href=\"" . htmlspecialchars ($booking['url']) . "\" target=\"_blank\" class=\"noarrow\"><img src=\"/images/icons/world.png\" alt=\"\" title=\"Go to webpage for this booking\" /></a> " : '');
-		$lines['name'] = sprintf ('<h5' . ($isOverlapMessage ? ' class="overlap"' : '') . '>%s<a href="%s">%s</a></h5>', $editLink . $cloneLink . $webLink, $link, $name);
+		$lines['name'] = sprintf ('<h5' . ($isOverlapMessage ? ' class="overlap"' : '') . '>%s<a href="%s">%s</a></h5>', $editLink . $cloneLink . $deleteLink . $webLink, $link, $name);
 		
 		# Add the activity
 		$lines[] = "<p class=\"activity\"><a href=\"{$this->baseUrl}/activities/" . htmlspecialchars (urlencode ($booking['activityMoniker'])) . '/">' . htmlspecialchars ($booking['activityName']) . '</a></p>';
