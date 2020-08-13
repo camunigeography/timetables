@@ -2721,7 +2721,7 @@ class timetables extends frontControllerApplication
 		);
 		
 		# Only admins can change reviewer attribute
-		if ($this->userIsAdministrator ()) {
+		if (!$this->userIsAdministrator ()) {
 			$dataBindingParameters['exclude'][] = 'reviewer';
 		}
 		
