@@ -837,7 +837,7 @@ class timetables extends frontControllerApplication
 		
 		# Set other default return values
 		$linkableParameters = array ();
-		$listing = array ();
+		$listingHtml = array ();			// HTML giving a list that the user then selects from, e.g. which term
 		$forceListing = false;
 		$breadcrumbEntries = array ();
 		$highlightBookings = false;
@@ -896,7 +896,7 @@ class timetables extends frontControllerApplication
 						}
 						$where[$objectType] = 'areaOfActivityId IN (' . implode (',', $activitiesFamilyIdsQuoted) . ')';
 						$linkableParameters['areaOfActivityId'] = $item['id'];
-						$listing = $this->activitiesLinks ($filterParameters['id']);
+						$listingHtml = $this->activitiesLinks ($filterParameters['id']);
 						$breadcrumbEntries = $this->registerBreadcrumbEntries ($breadcrumbEntries, $objectType, $item['name']);
 						$typeDescription = 'another activity';
 					}
@@ -908,7 +908,7 @@ class timetables extends frontControllerApplication
 					if ($item = $this->getPeople ($filterParameters['id'])) {		// Validate the person exists
 						$where[$objectType] = $this->personClashCheckingWhereClause ($item['id']);
 						$linkableParameters['bookedForUserid'] = $item['id'];
-						$listing = $this->peopleLinks ();
+						$listingHtml = $this->peopleLinks ();
 						$breadcrumbEntries = $this->registerBreadcrumbEntries ($breadcrumbEntries, $objectType, $item['name']);
 						$typeDescription = 'someone else';
 					}
@@ -920,7 +920,7 @@ class timetables extends frontControllerApplication
 					if ($item = $this->getRooms ($filterParameters['id'])) {		// Validate the room exists
 						$where[$objectType] = 'roomId = ' . $this->databaseConnection->quote ($item['id']);
 						$linkableParameters['roomId'] = $item['id'];
-						$listing = $this->roomsLinks ();
+						$listingHtml = $this->roomsLinks ();
 						$breadcrumbEntries = $this->registerBreadcrumbEntries ($breadcrumbEntries, $objectType, $item['name']);
 						$typeDescription = 'another room';
 						$where['suppressedFromListingsByDefault'] = false;	// i.e. do not perform this check
@@ -945,7 +945,7 @@ class timetables extends frontControllerApplication
 				if (preg_match ('/^20[0-3][0-9]$/', $filterParameters['year'])) {
 					$useImplicitViewDates = false;
 					$where['date_year'] = "YEAR(`date`) = {$filterParameters['year']}";
-					$listing = $this->monthLinks ($filterParameters['year']);
+					$listingHtml = $this->monthLinks ($filterParameters['year']);
 					$forceListing = true;
 				}
 				if (!isSet ($where['date_year'])) {return false;}	// Invalid URL, so cancel all matches so far
@@ -971,7 +971,7 @@ class timetables extends frontControllerApplication
 						#!# Also need to ensure the date is in the seed list (or use another testing metric), so that dates like 1968 or 2040 are treated as invalid URLs
 						if (checkdate ($monthNumber, $filterParameters['day'], $filterParameters['year'])) {
 							$where['date_day'] = "DAYOFMONTH(`date`) = {$filterParameters['day']}";
-							$listing = $this->dayLinks ($filterParameters['year'], $monthNumber);
+							$listingHtml = $this->dayLinks ($filterParameters['year'], $monthNumber);
 							$typeDescription = 'another day';
 						}
 					}
@@ -991,7 +991,7 @@ class timetables extends frontControllerApplication
 							if ($matches[1] + 1 == $matches[2]) {	// Ensure they are incremental, e.g. 2019-20 not 2019-21
 								$useImplicitViewDates = false;
 								$where['date_customyear'] = "((YEAR(`date`) = 20{$matches[1]} AND MONTH(`date`) >= {$this->settings['startingMonthCustomYear']}) OR (YEAR(`date`) = 20{$matches[2]} AND MONTH(`date`) < {$this->settings['startingMonthCustomYear']}))";
-								$listing = $this->termLinks ($filterParameters['customyear']);
+								$listingHtml = $this->termLinks ($filterParameters['customyear']);
 								$forceListing = true;
 							}
 						}
@@ -1010,7 +1010,7 @@ class timetables extends frontControllerApplication
 								$where['date_until'] = "`date` <= '" . $this->fridayOfDate ($term['untilDate']) . "'";
 								unset ($where['date_customyear']);	// Not necessary as the term is more specific
 								$customWeeks = $this->getCustomWeeks ($filterParameters['customyear'], $filterParameters['term']);
-								$listing = $this->customWeekLinks ($customWeeks);
+								$listingHtml = $this->customWeekLinks ($customWeeks);
 								$forceListing = false;
 								#!# Question of inconsistency here - this shows the container weeks but should also have other terms
 								$typeDescription = 'a week in this term';
@@ -1028,7 +1028,7 @@ class timetables extends frontControllerApplication
 									$where['date_customweek'] = "`date` >= '" . $this->mondayOfDate ($customWeek['startDate']) . "'";
 									$where['date_until'] = "`date` <= '" . $this->fridayOfDate ($customWeek['untilDate']) . "'";
 									unset ($where['date_term']);	// Not necessary as the named week is more specific (and in any case may not be exactly within the term)
-									$listing = $this->customWeekLinks ($customWeeks);
+									$listingHtml = $this->customWeekLinks ($customWeeks);
 									$typeDescription = 'another week in this term';
 								}
 							}
@@ -1050,7 +1050,7 @@ class timetables extends frontControllerApplication
 		//application::dumpData ($linkableParameters);
 		
 		# Return the data
-		return array ($where, $linkableParameters, $listing, $forceListing, $breadcrumbEntries, $typeDescription, $highlightBookings, $introductoryText);
+		return array ($where, $linkableParameters, $listingHtml, $forceListing, $breadcrumbEntries, $typeDescription, $highlightBookings, $introductoryText);
 	}
 	
 	
