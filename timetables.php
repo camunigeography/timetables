@@ -207,7 +207,7 @@ class timetables extends frontControllerApplication
 			  `createdOn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Automatic timestamp',
 			  `people` text COLLATE utf8mb4_unicode_ci COMMENT 'People always associated with this activity (usernames, one per line)',
 			  `website` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Website',
-			  `hideFromNew` int(1) DEFAULT NULL COMMENT 'Whether to hide this for new event creation',
+			  `hideFromNew` tinyint DEFAULT NULL COMMENT 'Whether to hide this for new event creation',
 			  PRIMARY KEY (`id`),
 			  UNIQUE KEY `moniker` (`moniker`)
 			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8mb4_unicode_ci COMMENT='Area of activity';
@@ -226,9 +226,9 @@ class timetables extends frontControllerApplication
 			  `series` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Series ID',
 			  `url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Web link, if any',
 			  `notes` text COLLATE utf8mb4_unicode_ci COMMENT 'Miscellaneous notes',
-			  `draft` int(1) DEFAULT NULL COMMENT 'Draft booking (hidden for now)?',
+			  `draft` tinyint DEFAULT NULL COMMENT 'Draft booking (hidden for now)?',
 			  `requestedBy` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Requested booking by',
-			  `hideFromDisplayBoard` int(1) DEFAULT NULL COMMENT 'Hide from display board listing?',
+			  `hideFromDisplayBoard` tinyint DEFAULT NULL COMMENT 'Hide from display board listing?',
 			  `bookedByUserid` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Person making the booking',
 			  `updatedByUserid` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Person updating the booking',
 			  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Automatic timestamp (created at)',
@@ -241,7 +241,7 @@ class timetables extends frontControllerApplication
 			  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Automatic key',
 			  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Name of the building',
 			  `moniker` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'URL component (must be unique)',
-			  `isInternal` int(1) DEFAULT NULL COMMENT 'Is this building internal?',
+			  `isInternal` tinyint DEFAULT NULL COMMENT 'Is this building internal?',
 			  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Automatic timestamp',
 			  PRIMARY KEY (`id`),
 			  UNIQUE KEY `moniker` (`moniker`)
@@ -251,7 +251,7 @@ class timetables extends frontControllerApplication
 			CREATE TABLE `editors` (
 			  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Automatic key',
 			  `userid` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'User ID',
-			  `reviewer` int(1) DEFAULT NULL COMMENT 'Reviewer?',
+			  `reviewer` tinyint DEFAULT NULL COMMENT 'Reviewer?',
 			  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Automatic timestamp',
 			  PRIMARY KEY (`id`),
 			  UNIQUE KEY `userId` (`userid`)
@@ -285,7 +285,7 @@ class timetables extends frontControllerApplication
 			  `longitude` float(11,6) DEFAULT NULL COMMENT 'Map longitude',
 			  `latitude` float(10,6) DEFAULT NULL COMMENT 'Map latitude',
 			  `universityMapUrl` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'University Map link',
-			  `suppressedFromListingsByDefault` int(1) DEFAULT NULL COMMENT 'Suppress from listings?',
+			  `suppressedFromListingsByDefault` tinyint DEFAULT NULL COMMENT 'Suppress from listings?',
 			  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Automatic timestamp',
 			  PRIMARY KEY (`id`),
 			  UNIQUE KEY `moniker` (`moniker`)
@@ -303,7 +303,7 @@ class timetables extends frontControllerApplication
 			  `workingDayStartHour` int(2) NOT NULL COMMENT 'Working day start hour (0-23)',
 			  `workingDayUntilHour` int(2) NOT NULL COMMENT 'Working day until hour (0-23)',
 			  `startingDayNaturalWeek` int(1) NOT NULL DEFAULT '1' COMMENT 'The starting day of a natural week',
-			  `showWeekends` int(1) DEFAULT NULL COMMENT 'Whether to show weekends',
+			  `showWeekends` tinyint DEFAULT NULL COMMENT 'Whether to show weekends',
 			  `minimumWeeks` int(2) NOT NULL DEFAULT '4' COMMENT 'Minimum weeks to show in certain views',
 			  `maximumWeeks` int(2) NOT NULL DEFAULT '8' COMMENT 'Maximum weeks to show in certain views',
 			  `startingDayCustomWeek` int(1) DEFAULT NULL COMMENT 'The starting day of a custom week',
@@ -315,7 +315,7 @@ class timetables extends frontControllerApplication
 			  `weeksInTerm` int(2) DEFAULT NULL COMMENT 'The number of weeks in a term',
 			  `weeksInTermFirstNumber` int(1) DEFAULT NULL COMMENT 'The numbering of the first week in term (e.g. 1 or 0)',
 			  `termDatesUrl` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Web link URL showing term dates reference',
-			  `skipPreviousDays` int(1) DEFAULT NULL COMMENT 'Whether to enable skipping of past days in the table views',
+			  `skipPreviousDays` tinyint DEFAULT NULL COMMENT 'Whether to enable skipping of past days in the table views',
 			  `yearsAheadBookable` int(2) NOT NULL COMMENT 'How many years ahead are bookable',
 			  `yearsBehindBookable` int(2) DEFAULT NULL COMMENT 'How many years behind are bookable',
 			  `defaultBookingLengthHours` int(1) NOT NULL DEFAULT '1' COMMENT 'Default length in hours of a booking when following a link from the grid view',
