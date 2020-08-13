@@ -846,6 +846,9 @@ class timetables extends frontControllerApplication
 		# Set to add implicit dates by default
 		$useImplicitViewDates = true;
 		
+		# Whether to set a new filter date, i.e. the selected change (e.g. selecting a custom week within a term) implies the equivalent of a drop-down filter date change
+		$setFilterDate = false;
+		
 		# For clarity, remove the global action as this is never valid
 		if (isSet ($filterParameters['action'])) {unset ($filterParameters['action']);}
 		
@@ -998,7 +1001,7 @@ class timetables extends frontControllerApplication
 						if (!isSet ($where['date_customyear'])) {return false;}	// Invalid URL, so cancel all matches so far
 					}
 					
-					# Term, which requires custom year
+					# Term, which requires custom year having been selected in the UI
 					if (isSet ($where['date_customyear'])) {
 						if (isSet ($filterParameters['term'])) {
 							$termLabels = $this->getTermLabels ();
@@ -1006,7 +1009,9 @@ class timetables extends frontControllerApplication
 								if (!$term = $this->getTerm ($filterParameters['customyear'], $filterParameters['term'])) {
 									return false;	// Invalid or not yet present in the data
 								}
-								$where['date_term'] = "`date` >= '" . $this->mondayOfDate ($term['startDate']) . "'";
+								$beginDate = $this->mondayOfDate ($term['startDate']);
+								$where['date_term'] = "`date` >= '" . $beginDate . "'";
+								$setFilterDate = $beginDate;
 								$where['date_until'] = "`date` <= '" . $this->fridayOfDate ($term['untilDate']) . "'";
 								unset ($where['date_customyear']);	// Not necessary as the term is more specific
 								$customWeeks = $this->getCustomWeeks ($filterParameters['customyear'], $filterParameters['term']);
@@ -1019,13 +1024,15 @@ class timetables extends frontControllerApplication
 						}
 					}
 					
-					# Named week (e.g. week1), which requires term (and, by implication, a custom year)
+					# Named week (e.g. week1), which requires term (and, by implication, a custom year) having been selected in the UI
 					if (isSet ($where['date_term'])) {
 						if (isSet ($filterParameters['customweek'])) {
 							if (preg_match ('/^([0-9]+)$/', $filterParameters['customweek'], $matches)) {
 								if (isSet ($customWeeks[$filterParameters['customweek']])) {
 									$customWeek = $customWeeks[$filterParameters['customweek']];
-									$where['date_customweek'] = "`date` >= '" . $this->mondayOfDate ($customWeek['startDate']) . "'";
+									$beginDate = $this->mondayOfDate ($customWeek['startDate']);
+									$where['date_customweek'] = "`date` >= '" . $beginDate . "'";
+									$setFilterDate = $beginDate;
 									$where['date_until'] = "`date` <= '" . $this->fridayOfDate ($customWeek['untilDate']) . "'";
 									unset ($where['date_term']);	// Not necessary as the named week is more specific (and in any case may not be exactly within the term)
 									$listingHtml = $this->customWeekLinks ($customWeeks);
@@ -1043,6 +1050,14 @@ class timetables extends frontControllerApplication
 		if ($useImplicitViewDates) {
 			$where['date_implicit_from']  = "`date` >= '" . $this->mondayOfDate ($this->userProfile['startDate']) . "'";	// This is done in PHP rather than using MySQL's NOW() as NOW() results in a query cache miss
 			$where['date_implicit_until'] = "`date` <= '" . $this->fridayOfDate ($this->userProfile['untilDate']) . "'";
+		}
+		
+		# If required, set the new filter date
+		if ($setFilterDate) {
+			$this->saveImplicitViewDates ($setFilterDate, $this->userProfile['weeksAhead']);
+			
+			# Overwrite the startDate for the filter drop-down; a redirect is not reliable as it will cause a once-only redirect loop when not logged in (i.e. pure cookie setting)
+			$this->userProfile['startDate'] = $setFilterDate;
 		}
 		
 		//application::dumpData ($filterParameters);
