@@ -282,6 +282,7 @@ class timetables extends frontControllerApplication
 			  `buildingId` int(11) DEFAULT NULL COMMENT 'Building',
 			  `moniker` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'URL component (must be unique)',
 			  `note` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Note to other Editors',
+			  `ignoreClashes` TINYINT NULL DEFAULT NULL COMMENT 'Ignore clashes in clash-checking?'
 			  `longitude` float(11,6) DEFAULT NULL COMMENT 'Map longitude',
 			  `latitude` float(10,6) DEFAULT NULL COMMENT 'Map latitude',
 			  `universityMapUrl` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'University Map link',
@@ -4209,7 +4210,7 @@ class timetables extends frontControllerApplication
 					
 				# Room clashes
 				case 'roomId':
-					$clashFieldsClauses[$field] = "(roomId = :roomId)";
+					$clashFieldsClauses[$field] = "(roomId = :roomId AND (ignoreClashes IS NULL OR ignoreClashes = ''))";
 					$preparedStatementValues[$field] = $formData[$field];
 					break;
 					
@@ -4243,7 +4244,8 @@ class timetables extends frontControllerApplication
 				REPLACE(LOWER(DATE_FORMAT(CONCAT(date,' ',startTime),'%l.%i%p')),'.00','') as startTimeFormatted,
 				REPLACE(LOWER(DATE_FORMAT(CONCAT(date,' ',untilTime),'%l.%i%p')),'.00','') as untilTimeFormatted,
 				CONCAT_WS(', ',rooms.name,buildings.name) AS roomName,
-				rooms.moniker as roomMoniker
+				rooms.moniker as roomMoniker,
+				rooms.ignoreClashes AS roomIgnoreClashes
 			FROM bookings
 			LEFT JOIN rooms ON bookings.roomId = rooms.id
 			LEFT JOIN areaOfActivity ON bookings.areaOfActivityid = areaOfActivity.id
@@ -4271,7 +4273,6 @@ class timetables extends frontControllerApplication
 		application::dumpData ($preparedStatementValues);
 		application::dumpData ($data);
 		application::dumpData ($this->databaseConnection->error ());
-		die;
 		*/
 		
 		# If there are any clashes, return the details
@@ -4284,9 +4285,11 @@ class timetables extends frontControllerApplication
 			$timePeriodDescription = "from {$existingBooking['startTimeFormatted']}-{$existingBooking['untilTimeFormatted']} on <a href=\"{$this->baseUrl}{$existingBooking['dateLinkFormatted']}\">{$existingBooking['dateFormatted']}</a>";
 			
 			# Room clashes
-			if ($formData['roomId'] == $existingBooking['roomId']) {
-				$anotherBookingDescription = "<a href=\"{$this->baseUrl}/bookings/{$existingBooking['id']}/\">another booking</a>";
-				$clashMessages[] = "{$roomDescriptionLink} is already in use for {$anotherBookingDescription} {$timePeriodDescription}.";
+			if (!$existingBooking['roomIgnoreClashes']) {		// This additional constraint is necessary, because the WHERE clause could have matched this booking for other reasons, e.g. person clash
+				if ($formData['roomId'] == $existingBooking['roomId']) {
+					$anotherBookingDescription = "<a href=\"{$this->baseUrl}/bookings/{$existingBooking['id']}/\">another booking</a>";
+					$clashMessages[] = "{$roomDescriptionLink} is already in use for {$anotherBookingDescription} {$timePeriodDescription}.";
+				}
 			}
 			
 			# If there is a user/users clash, return that; we have to check each individually
