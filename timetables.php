@@ -878,7 +878,7 @@ class timetables extends frontControllerApplication
 						$breadcrumbEntries = $this->registerBreadcrumbEntries ($breadcrumbEntries, $objectType, $name);
 						$typeDescription = 'other bookings';
 						$highlightBookings = array_keys ($items);
-						$introductoryText = "\n<p>" . ($totalFound == 1 ? "The booking, #{$firstBookingId}, is" : "The {$totalFound} selected bookings are") . ' shown <span class="highlighted">highlighted</span> below amongst any other bookings.</p>';
+						$introductoryText = "\n<p>" . ($totalFound == 1 ? "The booking, #{$firstBookingId}, is" : "The {$totalFound} selected bookings are") . ' shown <span class="highlighted">highlighted</span> below, amongst any other bookings.</p>';
 						
 						# Determine the date range
 						$useImplicitViewDates = false;
