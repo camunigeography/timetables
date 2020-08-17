@@ -4192,9 +4192,9 @@ class timetables extends frontControllerApplication
 	{
 		# Determine clash fields, and whether they are people-related
 		$clashFields = array (
-			'roomId' => false,
-			'bookedForUserid' => true,
-			'areaOfActivityId' => true,
+			'roomId',
+			'bookedForUserid',
+			'areaOfActivityId',
 		);
 		
 		# Determine whether to run clash-checking, based on whether the form is sufficiently populated yet
@@ -4204,34 +4204,32 @@ class timetables extends frontControllerApplication
 		$clashFieldsClauses = array ();
 		$preparedStatementValues = array ();
 		foreach ($clashFieldsPresent as $field) {
-			
-			# Special handling for people-related fields
-			$isPeopleRelated = $clashFields[$field];
-			if ($isPeopleRelated) {
-				
-				# Determine the people involved, either those directly listed, or the area of activity involved
-				switch ($field) {
-					case 'bookedForUserid':
-						$usernamesString = $formData[$field];
-						break;
-					case 'areaOfActivityId':
-						$usernamesString = $this->peopleInActivity ($formData[$field]);
-						break;
-				}
-				
-				# If usernames are being supplied, assemble a where clause based on these users
-				if ($usernamesString) {
-					$usernames = application::splitCombinedTokenList ($usernamesString);
-					$clashFieldsClauses[$field] = $this->personClashCheckingWhereClause ($usernames);
-				}
-				continue;
+			$usernamesString = false;
+			switch ($field) {
+					
+				# Room clashes
+				case 'roomId':
+					$clashFieldsClauses[$field] = "(roomId = :roomId)";
+					$preparedStatementValues[$field] = $formData[$field];
+					break;
+					
+				# Determine the people involved, in the case of those directly listed
+				case 'bookedForUserid':
+					$usernamesString = $formData[$field];
+					break;
+					
+				# Determine the people involved, in the case of the area of activity involved
+				case 'areaOfActivityId':
+					$usernamesString = $this->peopleInActivity ($formData[$field]);
+					break;
 			}
 			
-			# Otherwise, standard handling
-			$clashFieldsClauses[$field] = "({$field} = :{$field})";
-			$preparedStatementValues[$field] = $formData[$field];
+			# If usernames are being supplied, convert to a where clause based on these users
+			if ($usernamesString) {
+				$usernames = application::splitCombinedTokenList ($usernamesString);
+				$clashFieldsClauses[$field] = $this->personClashCheckingWhereClause ($usernames);
+			}
 		}
-		$clashFieldsClauses = implode (' OR ', $clashFieldsClauses);
 		
 		# Obtain the data
 		$query = "SELECT
@@ -4258,7 +4256,7 @@ class timetables extends frontControllerApplication
 					OR (CAST(CONCAT(date,' ',startTime) AS DATETIME) >= CAST(CONCAT(:date,' ',:startTime) AS DATETIME) AND CAST(CONCAT(date,' ',untilTime) AS DATETIME) <= CAST(CONCAT(:date,' ',:untilTime) AS DATETIME) )
 				)
 				AND (
-					{$clashFieldsClauses}
+					" . implode (' OR ', $clashFieldsClauses) . "
 				)
 				" . ($editingId ? 'AND bookings.id != ' . $this->databaseConnection->quote ($editingId) : '') . "
 		;";
@@ -4323,7 +4321,7 @@ class timetables extends frontControllerApplication
 		
 		# Require at least one of the clash-related fields
 		$clashFieldsPresent = array ();
-		foreach ($clashFields as $field => $peopleRelated) {
+		foreach ($clashFields as $field) {
 			if (strlen ($formData[$field])) {
 				$clashFieldsPresent[] = $field;
 			}
