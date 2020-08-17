@@ -4214,16 +4214,9 @@ class timetables extends frontControllerApplication
 		}
 		if (!$clashFieldsPresent) {return false;}
 		
-		# Sanitise each input
-		#!# Need to replace this with prepared statements
-		$inputFields = array_merge ($timeFields, array_keys ($clashFields));
-		$formDataQuoted = array ();
-		foreach ($inputFields as $field) {
-			$formDataQuoted[$field] = $this->databaseConnection->quote ($formData[$field]);
-		}
-		
 		# Create an SQL snippet covering each of the clash fields
 		$clashFieldsClauses = array ();
+		$preparedStatementValues = array ();
 		foreach ($clashFieldsPresent as $field) {
 			
 			# Special handling for people-related fields
@@ -4249,7 +4242,8 @@ class timetables extends frontControllerApplication
 			}
 			
 			# Otherwise, standard handling
-			$clashFieldsClauses[$field] = "({$field} = {$formDataQuoted[$field]})";
+			$clashFieldsClauses[$field] = "({$field} = :{$field})";
+			$preparedStatementValues[$field] = $formData[$field];
 		}
 		$clashFieldsClauses = implode (' OR ', $clashFieldsClauses);
 		
@@ -4270,27 +4264,26 @@ class timetables extends frontControllerApplication
 			LEFT JOIN areaOfActivity ON bookings.areaOfActivityid = areaOfActivity.id
 			LEFT JOIN buildings ON rooms.buildingId = buildings.id
 			WHERE
-				    date = {$formDataQuoted['date']}
+				    date = :date
 				AND (
 					/* Check for date range clashes - see http://stackoverflow.com/questions/8914457/ */
-					/* Originally:
-					   (startTime <= {$formDataQuoted['startTime']} AND untilTime >  {$formDataQuoted['startTime']})
-					OR (startTime <  {$formDataQuoted['untilTime']} AND untilTime >= {$formDataQuoted['untilTime']})
-					OR (startTime >= {$formDataQuoted['startTime']} AND untilTime <= {$formDataQuoted['untilTime']})
-					*/
-					   (CAST(CONCAT(date,' ',startTime) AS DATETIME) <= CAST(CONCAT({$formDataQuoted['date']},' ',{$formDataQuoted['startTime']}) AS DATETIME) AND CAST(CONCAT(date,' ',untilTime) AS DATETIME) >  CAST(CONCAT({$formDataQuoted['date']},' ',{$formDataQuoted['startTime']}) AS DATETIME) )
-					OR (CAST(CONCAT(date,' ',startTime) AS DATETIME) <  CAST(CONCAT({$formDataQuoted['date']},' ',{$formDataQuoted['untilTime']}) AS DATETIME) AND CAST(CONCAT(date,' ',untilTime) AS DATETIME) >= CAST(CONCAT({$formDataQuoted['date']},' ',{$formDataQuoted['untilTime']}) AS DATETIME) )
-					OR (CAST(CONCAT(date,' ',startTime) AS DATETIME) >= CAST(CONCAT({$formDataQuoted['date']},' ',{$formDataQuoted['startTime']}) AS DATETIME) AND CAST(CONCAT(date,' ',untilTime) AS DATETIME) <= CAST(CONCAT({$formDataQuoted['date']},' ',{$formDataQuoted['untilTime']}) AS DATETIME) )
+					   (CAST(CONCAT(date,' ',startTime) AS DATETIME) <= CAST(CONCAT(:date,' ',:startTime) AS DATETIME) AND CAST(CONCAT(date,' ',untilTime) AS DATETIME) >  CAST(CONCAT(:date,' ',:startTime) AS DATETIME) )
+					OR (CAST(CONCAT(date,' ',startTime) AS DATETIME) <  CAST(CONCAT(:date,' ',:untilTime) AS DATETIME) AND CAST(CONCAT(date,' ',untilTime) AS DATETIME) >= CAST(CONCAT(:date,' ',:untilTime) AS DATETIME) )
+					OR (CAST(CONCAT(date,' ',startTime) AS DATETIME) >= CAST(CONCAT(:date,' ',:startTime) AS DATETIME) AND CAST(CONCAT(date,' ',untilTime) AS DATETIME) <= CAST(CONCAT(:date,' ',:untilTime) AS DATETIME) )
 				)
 				AND (
 					{$clashFieldsClauses}
 				)
 				" . ($editingId ? 'AND bookings.id != ' . $this->databaseConnection->quote ($editingId) : '') . "
 		;";
-		$data = $this->databaseConnection->getData ($query);
+		$preparedStatementValues['date'] = $formData['date'];
+		$preparedStatementValues['startTime'] = $formData['startTime'];
+		$preparedStatementValues['untilTime'] = $formData['untilTime'];
+		$data = $this->databaseConnection->getData ($query, false, true, $preparedStatementValues);
 		
 		/*
 		application::dumpData ($query);
+		application::dumpData ($preparedStatementValues);
 		application::dumpData ($data);
 		application::dumpData ($this->databaseConnection->error ());
 		die;
