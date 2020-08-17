@@ -4242,7 +4242,8 @@ class timetables extends frontControllerApplication
 				LOWER(DATE_FORMAT(date,'/%Y/%M/%e/')) AS dateLinkFormatted,
 				REPLACE(LOWER(DATE_FORMAT(CONCAT(date,' ',startTime),'%l.%i%p')),'.00','') as startTimeFormatted,
 				REPLACE(LOWER(DATE_FORMAT(CONCAT(date,' ',untilTime),'%l.%i%p')),'.00','') as untilTimeFormatted,
-				CONCAT_WS(', ',rooms.name,buildings.name) AS roomName
+				CONCAT_WS(', ',rooms.name,buildings.name) AS roomName,
+				rooms.moniker as roomMoniker
 			FROM bookings
 			LEFT JOIN rooms ON bookings.roomId = rooms.id
 			LEFT JOIN areaOfActivity ON bookings.areaOfActivityid = areaOfActivity.id
@@ -4279,7 +4280,7 @@ class timetables extends frontControllerApplication
 			$existingBooking = $data[0];	// This will always be present; just use the first if there is more than one, so that the user has to work through one problem at a time
 			
 			# Define links to each component of the error message
-			$roomDescriptionLink = "<a href=\"{$this->baseUrl}/rooms/{$existingBooking['roomId']}/\">" . htmlspecialchars ($existingBooking['roomName']) . '</a>';
+			$roomDescriptionLink = "<a href=\"{$this->baseUrl}/rooms/{$existingBooking['roomMoniker']}/\">" . htmlspecialchars ($existingBooking['roomName']) . '</a>';
 			$timePeriodDescription = "from {$existingBooking['startTimeFormatted']}-{$existingBooking['untilTimeFormatted']} on <a href=\"{$this->baseUrl}{$existingBooking['dateLinkFormatted']}\">{$existingBooking['dateFormatted']}</a>";
 			
 			# Room clashes
