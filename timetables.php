@@ -4190,14 +4190,6 @@ class timetables extends frontControllerApplication
 	# Function to check for booking clashes
 	private function bookingClash ($formData, $editingId = false)
 	{
-		# Do not run checks if all the time-related fields are not present
-		$timeFields = array ('date', 'startTime', 'untilTime');
-		foreach ($timeFields as $field) {
-			if (!strlen ($formData[$field])) {
-				return false;
-			}
-		}
-		
 		# Determine clash fields, and whether they are people-related
 		$clashFields = array (
 			'roomId' => false,
@@ -4205,14 +4197,8 @@ class timetables extends frontControllerApplication
 			'areaOfActivityId' => true,
 		);
 		
-		# Require at least one of the clash-related fields
-		$clashFieldsPresent = array ();
-		foreach ($clashFields as $field => $peopleRelated) {
-			if (strlen ($formData[$field])) {
-				$clashFieldsPresent[] = $field;
-			}
-		}
-		if (!$clashFieldsPresent) {return false;}
+		# Determine whether to run clash-checking, based on whether the form is sufficiently populated yet
+		if (!$clashFieldsPresent = $this->clashCheckingRunnable ($formData, $clashFields)) {return false;}
 		
 		# Create an SQL snippet covering each of the clash fields
 		$clashFieldsClauses = array ();
@@ -4321,6 +4307,31 @@ class timetables extends frontControllerApplication
 		
 		# Return the messages (if any)
 		return $clashMessages;
+	}
+	
+	
+	# Determine whether to run clash-checking, based on whether the form is sufficiently populated yet
+	private function clashCheckingRunnable ($formData, $clashFields)
+	{
+		# Do not run checks if all the time-related fields are not present
+		$timeFields = array ('date', 'startTime', 'untilTime');
+		foreach ($timeFields as $field) {
+			if (!strlen ($formData[$field])) {
+				return false;
+			}
+		}
+		
+		# Require at least one of the clash-related fields
+		$clashFieldsPresent = array ();
+		foreach ($clashFields as $field => $peopleRelated) {
+			if (strlen ($formData[$field])) {
+				$clashFieldsPresent[] = $field;
+			}
+		}
+		if (!$clashFieldsPresent) {return false;}
+		
+		# Can be run, so return the clash fields present
+		return $clashFieldsPresent;
 	}
 	
 	
