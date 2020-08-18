@@ -3547,7 +3547,7 @@ class timetables extends frontControllerApplication
 		</form>' . "\n";
 		*/
 		return $html = "\n\n" . '<form class="minisearch" method="post" name="minisearchform" action="' . $this->baseUrl . "/{$action}/search.html" . '" enctype="application/x-www-form-urlencoded" accept-charset="UTF-8">
-			<input name="search" type="search" size="30" value="' . $submittedValue . '" placeholder="Title of booking" /> <input type="submit" value="Search booking titles" class="button" />
+			<input name="search" type="search" size="20" value="' . $submittedValue . '" placeholder="Booking title search" /> <input type="submit" value="Search titles" class="button" />
 		</form>' . "\n";
 	}
 	
