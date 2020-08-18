@@ -3253,7 +3253,7 @@ class timetables extends frontControllerApplication
 				$urlId = (isSet ($entry['moniker']) ? $entry['moniker'] : $key);	// Prefer URL monikers if supplied
 				$data[$key]['View']		= "<a title=\"View\" href=\"{$this->baseUrl}/{$this->action}/{$urlId}/\">" . '<img src="/images/icons/page_white.png" alt="View" class="icon" /></a>';
 				$data[$key]['Edit']		= "<a title=\"Edit\" href=\"{$this->baseUrl}/{$this->action}/{$urlId}/edit.html\">" . '<img src="/images/icons/page_white_edit.png" alt="Edit" class="icon" /></a>';
-				$data[$key]['Duplicate']	= "<a title=\"Duplicate\" href=\"{$this->baseUrl}/{$this->action}/{$urlId}/clone.html\">" . '<img src="/images/icons/page_copy.png" alt="Duplicate" class="icon" /></a>';
+				$data[$key]['Clone']	= "<a title=\"Duplicate\" href=\"{$this->baseUrl}/{$this->action}/{$urlId}/clone.html\">" . '<img src="/images/icons/page_copy.png" alt="Duplicate" class="icon" /></a>';
 				$data[$key]['Delete']	= "<a title=\"Delete\" href=\"{$this->baseUrl}/{$this->action}/{$urlId}/delete.html\">" . '<img src="/images/icons/page_white_delete.png" alt="Delete" class="icon" /></a>';
 			}
 		}

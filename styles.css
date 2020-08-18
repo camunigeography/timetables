@@ -62,6 +62,7 @@
 #timetables table.datalist td.id a.actions {white-space: nowrap;}
 #timetables table.datalist td:first-child {min-width: 85px;}
 #timetables table.datalist td.url {max-width: 100px; overflow: hidden;}
+#timetables table.datalist th.View, #timetables table.datalist th.Edit, #timetables table.datalist th.Clone, #timetables table.datalist th.Delete {width: 45px; max-width: 45px; overflow: hidden;}
 #timetables .draftslist table tr td:first-child {padding-right: 20px; background-color: #eee; white-space: nowrap;}
 #timetables form.minisearch {float: right; position: relative; top: -4px;}
 #timetables form.minisearch input {font-size: 0.9em;}
