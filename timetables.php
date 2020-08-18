@@ -1502,7 +1502,7 @@ class timetables extends frontControllerApplication
 			'recent'	=> "<a href=\"{$this->baseUrl}/people/\"><img src=\"/images/icons/clock.png\" alt=\"\" /> Recent (have bookings in last year)</a>",
 			'all'		=> "<a href=\"{$this->baseUrl}/people/all.html\"><img src=\"/images/icons/clock_red.png\" alt=\"\" /> Everyone</a>",
 		);
-		$html .= application::htmlUl ($tabs, 0, 'tabs small', true, false, false, false, $mode);
+		$html .= application::htmlUl ($tabs, 0, $this->settings['tabUlClass'] . ' subtabs', true, false, false, false, $mode);
 		
 		# Get the list of people
 		$data = $this->getPeople (false, true, true, false, false, ($this->userIsEditor), $recentYears = ($mode == 'recent' ? 1 : false));
