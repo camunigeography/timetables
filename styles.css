@@ -72,6 +72,8 @@
 #timetables #exporting p {line-height: 14px; margin: 0; padding: O;}
 #timetables #exporting img {width: 36px; height: 14px; border: 0; vertical-align: middle; opacity: 0.6;}
 #timetables a.consolidate {color: #ccc; font-size: 0.8em; margin-left: 5px;}
+#timetables .dataform {margin-top: 25px;}
+#timetables .dataform table td:first-child, #timetables .dataform table th:first-child {width: 200px; padding-right: 10px;}
 /* https://css-tricks.com/snippets/css/prevent-long-urls-from-breaking-out-of-container/ */
 #timetables p.icslink {overflow-wrap: break-word; word-wrap: break-word; -ms-word-break: break-all; word-break: break-all; word-break: break-word; -moz-hyphens: auto; -webkit-hyphens: auto; hyphens: auto;}
 @media print {

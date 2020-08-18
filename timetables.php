@@ -3982,7 +3982,9 @@ class timetables extends frontControllerApplication
 			'unsavedDataProtection' => true,
 			'picker' => true,
 			'autofocus' => (!$data),
+			#!# Should be configurable
 			'jQuery' => false,		// Already loaded on the page
+			'div' => 'ultimateform horizontalonly dataform',
 		));
 		
 		# Assemble the dataBinding parameters
