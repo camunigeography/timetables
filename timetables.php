@@ -1269,8 +1269,9 @@ class timetables extends frontControllerApplication
 			$customYearSuffix = ($customYearMode ? '-' . substr (($year + 1), -2) : '');
 			$url = "{$this->baseUrl}/{$year}{$customYearSuffix}/";
 			$label = $year . $customYearSuffix;
+			$sublinks = ($customYearMode ? ':' . $this->termLinks ($label, false) : '');
 			if ($year == $currentYear) {$label = "<strong>{$label}</strong>";}
-			$list[] = "<a href=\"{$url}\">" . $label . '</a>';
+			$list[] = "<a href=\"{$url}\">" . $label . '</a>' . $sublinks;
 		}
 		
 		# Compile the HTML
@@ -1334,7 +1335,7 @@ class timetables extends frontControllerApplication
 	
 	
 	# Function to get a list of term links
-	private function termLinks ($customYear)
+	private function termLinks ($customYear, $showErrors = true)
 	{
 		# Get the terms
 		$allTerms = $this->getTerms ();
@@ -1345,9 +1346,13 @@ class timetables extends frontControllerApplication
 		# End if there are no terms for the current custom year
 		if (!isSet ($allTerms[$customYear])) {
 			list ($startYear, $endYear2digits) = explode ('-', $customYear);
-			$html  = "\n<p>The term dates for the requested have not yet been defined, so this listing is not available.</p>";
-			$html .= ($this->userIsEditor ? "\n<p>As an Editor, you can <a href=\"{$this->baseUrl}/terms/add.html?startYear={$startYear}&amp;endYear=20{$endYear2digits}\">add the term dates</a>.</p>" : '');
-			return $html;
+			if ($showErrors) {
+				$html  = "\n<p>The term dates for the requested have not yet been defined, so this listing is not available.</p>";
+				$html .= ($this->userIsEditor ? "\n<p>As an Editor, you can <a href=\"{$this->baseUrl}/terms/add.html?startYear={$startYear}&amp;endYear=20{$endYear2digits}\">add the term dates</a>.</p>" : '');
+				return $html;
+			} else {
+				return false;
+			}
 		}
 		
 		# Create the list
