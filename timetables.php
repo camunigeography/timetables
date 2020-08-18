@@ -3244,7 +3244,7 @@ class timetables extends frontControllerApplication
 		# Decorate the links
 		foreach ($data as $key => $entry) {
 			$urlId = (isSet ($entry['moniker']) ? $entry['moniker'] : $key);	// Prefer URL monikers if supplied
-			$data[$key]['id'] = "<a href=\"{$this->baseUrl}/{$this->action}/{$urlId}/edit.html\" class=\"actions\">" . '<img src="/images/icons/page_white_edit.png" alt="" class="icon" /> &nbsp; ' . "<strong>{$key}</strong></a>";
+			$data[$key]['id'] = "<a href=\"{$this->baseUrl}/{$this->action}/{$urlId}/edit.html\" class=\"actions\">" . '<img src="/images/icons/page_white_edit.png" alt="" class="icon" /> ' . "<strong>{$key}</strong></a>";
 		}
 		
 		# Add direct editing links, unless disabled
