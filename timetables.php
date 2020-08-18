@@ -3222,7 +3222,7 @@ class timetables extends frontControllerApplication
 		$data = $this->databaseConnection->substituteJoinedData ($data, $this->settings['database'], $table, 'name');
 		
 		# Substitute in names
-		$data = $this->substituteUseridTokensToNames ($data, $this->userFields);
+		$data = $this->substituteUseridTokensToNames ($data, $this->userFields, false, true);
 		
 		# Get the headings
 		$headings = $this->databaseConnection->getHeadings ($this->settings['database'], $table);
@@ -3283,7 +3283,7 @@ class timetables extends frontControllerApplication
 	
 	
 	# Function to substitute names in a table
-	private function substituteUseridTokensToNames ($data, $fieldsToConvert, $hyperlinked = false)
+	private function substituteUseridTokensToNames ($data, $fieldsToConvert, $hyperlinked = false, $showUsernameAlso = false)
 	{
 		# End if no data
 		if (!$data) {return $data;}
@@ -3310,7 +3310,11 @@ class timetables extends frontControllerApplication
 		foreach ($usersPerTokenString as $tokenString => $users) {
 			foreach ($users as $index => $userId) {
 				if (isSet ($people[$userId])) {
-					$usersPerTokenString[$tokenString][$index] = ($hyperlinked ? "<a href=\"{$this->baseUrl}/people/" . htmlspecialchars (urlencode ($userId)) . '/">' . htmlspecialchars ($people[$userId]['name']) . '</a>' : $people[$userId]['name']);
+					$label = $people[$userId]['name'];
+					if ($showUsernameAlso) {
+						$label .= " &lt;{$userId}&gt;";
+					}
+					$usersPerTokenString[$tokenString][$index] = ($hyperlinked ? "<a href=\"{$this->baseUrl}/people/" . htmlspecialchars (urlencode ($userId)) . '/">' . htmlspecialchars ($label) . '</a>' : $label);
 				}
 			}
 			$usersPerTokenString[$tokenString] = array_unique ($usersPerTokenString[$tokenString]);
