@@ -3221,6 +3221,7 @@ class timetables extends frontControllerApplication
 		
 		# Get the headings
 		$headings = $this->databaseConnection->getHeadings ($this->settings['database'], $table);
+		if (isSet ($headings['id']) && $headings['id'] == 'Automatic key') {$headings['id'] = '#';}
 		if ($additionalHeadings) {$headings = array_merge ($headings, $additionalHeadings);}
 		
 		# If exporting, render then end
