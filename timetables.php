@@ -3669,7 +3669,10 @@ class timetables extends frontControllerApplication
 		# Set a redirection message
 		$recordDescription = ($multipleIds ? 'records # ' : 'record ') . (ctype_digit ($linkId) ? '#' : '') . $linkId;
 		if ($do) {$recordDescription = "<a href=\"{$redirectTo}\">{$recordDescription}</a>";}
-		$message = "\n<p class=\"flashmessage\"><img src=\"/images/icons/tick.png\" class=\"icon\" alt=\"\" /> Thanks; {$recordDescription} " . ($multipleIds ? 'have' : 'has') . " been successfully " . ($multipleIds ? 'saved' /* One may be an update and the others inserts, so 'saved' is simpler */ : '%s') . ".</p>";
+		$message = "\n" . "<p><img src=\"/images/icons/tick.png\" class=\"icon\" alt=\"\" /> Thanks; {$recordDescription} " . ($multipleIds ? 'have' : 'has') . " been successfully " . ($multipleIds ? 'saved' /* One may be an update and the others inserts, so 'saved' is simpler */ : '%s') . ".</p>";
+		
+		# Surround the message with a div for styling
+		$message = "\n" . '<div class="flashmessage">' . $message . "\n" . '</div>';
 		
 		# If an achieved action has been set, set the flash
 		$cookiePath = $this->baseUrl . '/';
