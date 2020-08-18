@@ -328,6 +328,7 @@ class timetables extends frontControllerApplication
 			  `usersAutocomplete` VARCHAR(255) NULL COMMENT 'Users autocomplete URL',
 			  `usersExternalUrl` VARCHAR(255) NULL COMMENT 'Users database UI external URL',
 			  `calendarName` VARCHAR(255) NOT NULL DEFAULT 'calendar' COMMENT 'iCal calendar name',
+			  `wideCss` VARCHAR(255) NULL COMMENT 'CSS for wide layout'
 			  PRIMARY KEY (`id`)
 			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8mb4_unicode_ci COMMENT='Settings';
 			
@@ -1750,6 +1751,13 @@ class timetables extends frontControllerApplication
 			
 			# Start the pane
 			$panes[$format] = '';
+			
+			# Add CSS for grid
+			if ($format == 'grid') {
+				if ($this->settings['wideCss']) {
+					$panes[$format] .= "\n\t" . '<style type="text/css">' . htmlspecialchars ($this->settings['wideCss']) . '</style>' . "\n";
+				}
+			}
 			
 			# In grid and text modes, show drafts warning
 			$draftsWarningFormats = array ('grid', 'text');
