@@ -1,62 +1,79 @@
+# Timetables Apache directives
+
+# Load using:
+#	# Timetables system
+#	Include /path/to/timetables/.httpd.conf.extract.txt
+#	Use MacroTemplateApplication /path/to/timetables "/path/to/site/:/path/to/timetables/:/path/to/php/libraries/"
+
 
 # Timetables
-<Macro MacroTimetables $applicationBaseUrl $description>
-	Use MacroFrontControllerApplication "$applicationBaseUrl/" "$description"
-	<Location $applicationBaseUrl/>
+<Macro MacroTimetables $baseUrl $includePath>
+	
+	# Include path
+	<Location $baseUrl>
+		php_value include_path "$includePath"
+	</Location>
+	
+	# Front controller application support
+	Use MacroFrontControllerApplication "$baseUrl/" "Timetables"
+	
+	<Location $baseUrl/>
 		php_value output_buffering 65536
 	</Location>
-	RewriteEngine on
+	
+	# Application routing
 	# Timetable viewing URLs
 		# Browse/'My' timetable
-			RewriteRule ^$applicationBaseUrl/(|timetable.ics|export.html|timetable.csv)$ $applicationBaseUrl/index.html?export=$1 [L,QSA]
-			RewriteRule ^$applicationBaseUrl/reset.html$ $applicationBaseUrl/index.html?reset=1 [L,QSA]
-			RewriteRule ^$applicationBaseUrl/(browse|my|today)/(|timetable.ics|export.html|timetable.csv)$ $applicationBaseUrl/index.html?action=$1&export=$2 [L,QSA]
-			RewriteRule ^$applicationBaseUrl/(browse|my|today)$ $applicationBaseUrl/$1/ [R]
+			RewriteRule ^$baseUrl/(|timetable.ics|export.html|timetable.csv)$ $baseUrl/index.html?export=$1 [L,QSA]
+			RewriteRule ^$baseUrl/reset.html$ $baseUrl/index.html?reset=1 [L,QSA]
+			RewriteRule ^$baseUrl/(browse|my|today)/(|timetable.ics|export.html|timetable.csv)$ $baseUrl/index.html?action=$1&export=$2 [L,QSA]
+			RewriteRule ^$baseUrl/(browse|my|today)$ $baseUrl/$1/ [R]
 		# Natural dates; these may have an optional /type/id/ prefix, e.g. /activities/2/2012/, using this optional regexp block: ((activities|people|rooms)/([a-zA-Z0-9]+)/)?
 			# Year only
-			RewriteRule ^$applicationBaseUrl/((activities|people|rooms)/([^/]+)/)?(20[0-3][0-9])/(|timetable.ics|export.html|timetable.csv)$ $applicationBaseUrl/index.html?action=browse&do=list&year=$4&object=$2&id=$3&export=$5 [L,QSA]
-			RewriteRule ^$applicationBaseUrl/((activities|people|rooms)/([^/]+)/)?(20[0-3][0-9])$ $applicationBaseUrl/$1$4/ [R=301]
+			RewriteRule ^$baseUrl/((activities|people|rooms)/([^/]+)/)?(20[0-3][0-9])/(|timetable.ics|export.html|timetable.csv)$ $baseUrl/index.html?action=browse&do=list&year=$4&object=$2&id=$3&export=$5 [L,QSA]
+			RewriteRule ^$baseUrl/((activities|people|rooms)/([^/]+)/)?(20[0-3][0-9])$ $baseUrl/$1$4/ [R=301]
 			# Year and month
-			RewriteRule ^$applicationBaseUrl/((activities|people|rooms)/([^/]+)/)?(20[0-3][0-9])/(january|february|march|april|may|june|july|august|september|october|november|december)/(|timetable.ics|export.html|timetable.csv)$ $applicationBaseUrl/index.html?action=browse&do=list&year=$4&month=$5&object=$2&id=$3&export=$6 [L,QSA]
-			RewriteRule ^$applicationBaseUrl/((activities|people|rooms)/([^/]+)/)?(20[0-3][0-9])/(january|february|march|april|may|june|july|august|september|october|november|december)$ $applicationBaseUrl/$1$4/$5/ [R=301]
+			RewriteRule ^$baseUrl/((activities|people|rooms)/([^/]+)/)?(20[0-3][0-9])/(january|february|march|april|may|june|july|august|september|october|november|december)/(|timetable.ics|export.html|timetable.csv)$ $baseUrl/index.html?action=browse&do=list&year=$4&month=$5&object=$2&id=$3&export=$6 [L,QSA]
+			RewriteRule ^$baseUrl/((activities|people|rooms)/([^/]+)/)?(20[0-3][0-9])/(january|february|march|april|may|june|july|august|september|october|november|december)$ $baseUrl/$1$4/$5/ [R=301]
 			# Year, month and day
-			RewriteRule ^$applicationBaseUrl/((activities|people|rooms)/([^/]+)/)?(20[0-3][0-9])/(january|february|march|april|may|june|july|august|september|october|november|december)/([1-3]?[0-9])/(|timetable.ics|export.html|timetable.csv)$ $applicationBaseUrl/index.html?action=browse&do=list&year=$4&month=$5&day=$6&object=$2&id=$3&export=$7 [L,QSA]
-			RewriteRule ^$applicationBaseUrl/((activities|people|rooms)/([^/]+)/)?(20[0-3][0-9])/(january|february|march|april|may|june|july|august|september|october|november|december)/([1-3]?[0-9])$ $applicationBaseUrl/$1$4/$5/$6/ [R=301]
+			RewriteRule ^$baseUrl/((activities|people|rooms)/([^/]+)/)?(20[0-3][0-9])/(january|february|march|april|may|june|july|august|september|october|november|december)/([1-3]?[0-9])/(|timetable.ics|export.html|timetable.csv)$ $baseUrl/index.html?action=browse&do=list&year=$4&month=$5&day=$6&object=$2&id=$3&export=$7 [L,QSA]
+			RewriteRule ^$baseUrl/((activities|people|rooms)/([^/]+)/)?(20[0-3][0-9])/(january|february|march|april|may|june|july|august|september|october|november|december)/([1-3]?[0-9])$ $baseUrl/$1$4/$5/$6/ [R=301]
 		# Custom years/terms/weeks
 			# Custom year
-			RewriteRule ^$applicationBaseUrl/((activities|people|rooms)/([^/]+)/)?(20[0-3][0-9]-[0-3][0-9])/(|timetable.ics|export.html|timetable.csv)$ $applicationBaseUrl/index.html?action=browse&do=list&customyear=$4&object=$2&id=$3&export=$5 [L,QSA]
-			RewriteRule ^$applicationBaseUrl/((activities|people|rooms)/([^/]+)/)?(20[0-3][0-9]-[0-3][0-9])$ $applicationBaseUrl/$1$4/ [R=301]
+			RewriteRule ^$baseUrl/((activities|people|rooms)/([^/]+)/)?(20[0-3][0-9]-[0-3][0-9])/(|timetable.ics|export.html|timetable.csv)$ $baseUrl/index.html?action=browse&do=list&customyear=$4&object=$2&id=$3&export=$5 [L,QSA]
+			RewriteRule ^$baseUrl/((activities|people|rooms)/([^/]+)/)?(20[0-3][0-9]-[0-3][0-9])$ $baseUrl/$1$4/ [R=301]
 			# Custom year and term
-			RewriteRule ^$applicationBaseUrl/((activities|people|rooms)/([^/]+)/)?(20[0-3][0-9]-[0-3][0-9])/([a-z0-9]+)/(|timetable.ics|export.html|timetable.csv)$ $applicationBaseUrl/index.html?action=browse&do=list&customyear=$4&term=$5&object=$2&id=$3&export=$6 [L,QSA]
-			RewriteRule ^$applicationBaseUrl/((activities|people|rooms)/([^/]+)/)?(20[0-3][0-9]-[0-3][0-9])/([a-z0-9]+)$ $applicationBaseUrl/$1$4/$5/ [R=301]
+			RewriteRule ^$baseUrl/((activities|people|rooms)/([^/]+)/)?(20[0-3][0-9]-[0-3][0-9])/([a-z0-9]+)/(|timetable.ics|export.html|timetable.csv)$ $baseUrl/index.html?action=browse&do=list&customyear=$4&term=$5&object=$2&id=$3&export=$6 [L,QSA]
+			RewriteRule ^$baseUrl/((activities|people|rooms)/([^/]+)/)?(20[0-3][0-9]-[0-3][0-9])/([a-z0-9]+)$ $baseUrl/$1$4/$5/ [R=301]
 			# Custom year, term and week number
-			RewriteRule ^$applicationBaseUrl/((activities|people|rooms)/([^/]+)/)?(20[0-3][0-9]-[0-3][0-9])/([a-z0-9]+)/week([0-9]+)/(|timetable.ics|export.html|timetable.csv)$ $applicationBaseUrl/index.html?action=browse&do=list&customyear=$4&term=$5&customweek=$6&object=$2&id=$3&export=$7 [L,QSA]
-			RewriteRule ^$applicationBaseUrl/((activities|people|rooms)/([^/]+)/)?(20[0-3][0-9]-[0-3][0-9])/([a-z0-9]+)/week([0-9]+)$ $applicationBaseUrl/$1$4/$5/week$6/ [R=301]
+			RewriteRule ^$baseUrl/((activities|people|rooms)/([^/]+)/)?(20[0-3][0-9]-[0-3][0-9])/([a-z0-9]+)/week([0-9]+)/(|timetable.ics|export.html|timetable.csv)$ $baseUrl/index.html?action=browse&do=list&customyear=$4&term=$5&customweek=$6&object=$2&id=$3&export=$7 [L,QSA]
+			RewriteRule ^$baseUrl/((activities|people|rooms)/([^/]+)/)?(20[0-3][0-9]-[0-3][0-9])/([a-z0-9]+)/week([0-9]+)$ $baseUrl/$1$4/$5/week$6/ [R=301]
 		# Activities/people/rooms: These are routed via CRUD as they map to objects rather than being dynamic views
 	# People consolidation
-		RewriteRule ^$applicationBaseUrl/people/(consolidate)/$ $applicationBaseUrl/index.html?action=$1 [L,QSA]
-		RewriteRule ^$applicationBaseUrl/people/(consolidate)$ $applicationBaseUrl/people/$1/ [R]
-		RewriteRule ^$applicationBaseUrl/people/(consolidate)/([^/]+)/ $applicationBaseUrl/index.html?action=$1&item=$2 [L,QSA]
-		RewriteRule ^$applicationBaseUrl/people/(consolidate)/([^/]+)$ $applicationBaseUrl/people/$1/$2/ [R]
+		RewriteRule ^$baseUrl/people/(consolidate)/$ $baseUrl/index.html?action=$1 [L,QSA]
+		RewriteRule ^$baseUrl/people/(consolidate)$ $baseUrl/people/$1/ [R]
+		RewriteRule ^$baseUrl/people/(consolidate)/([^/]+)/ $baseUrl/index.html?action=$1&item=$2 [L,QSA]
+		RewriteRule ^$baseUrl/people/(consolidate)/([^/]+)$ $baseUrl/people/$1/$2/ [R]
 	# Editing (non-generic)
-		RewriteRule ^$applicationBaseUrl/(bookings)/(draft|alldrafts).html $applicationBaseUrl/index.html?action=$1&do=$2 [L,QSA]
-		RewriteRule ^$applicationBaseUrl/(bookings)/(request).html $applicationBaseUrl/index.html?action=$1&do=$2 [L,QSA]
+		RewriteRule ^$baseUrl/(bookings)/(draft|alldrafts).html $baseUrl/index.html?action=$1&do=$2 [L,QSA]
+		RewriteRule ^$baseUrl/(bookings)/(request).html $baseUrl/index.html?action=$1&do=$2 [L,QSA]
 	# Generic CRUD operations on most data structure types, though main objects have the timetable listing for the List view
-		RewriteRule ^$applicationBaseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|activities|people|rooms)/$ $applicationBaseUrl/index.html?action=$1&do=list [L,QSA]
-		RewriteRule ^$applicationBaseUrl/(bookings)/\1.(csv)$ $applicationBaseUrl/index.html?action=$1&do=list&exportall=$2 [L,QSA]
-		RewriteRule ^$applicationBaseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|activities|people|rooms)$ $applicationBaseUrl/$1/ [R]
-		RewriteRule ^$applicationBaseUrl/(people)/all.html$ $applicationBaseUrl/index.html?action=$1&do=list&mode=all [L,QSA]
-		RewriteRule ^$applicationBaseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|activities|people|rooms)/(add|search)\.html$ $applicationBaseUrl/index.html?action=$1&do=$2 [L,QSA]
+		RewriteRule ^$baseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|activities|people|rooms)/$ $baseUrl/index.html?action=$1&do=list [L,QSA]
+		RewriteRule ^$baseUrl/(bookings)/\1.(csv)$ $baseUrl/index.html?action=$1&do=list&exportall=$2 [L,QSA]
+		RewriteRule ^$baseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|activities|people|rooms)$ $baseUrl/$1/ [R]
+		RewriteRule ^$baseUrl/(people)/all.html$ $baseUrl/index.html?action=$1&do=list&mode=all [L,QSA]
+		RewriteRule ^$baseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|activities|people|rooms)/(add|search)\.html$ $baseUrl/index.html?action=$1&do=$2 [L,QSA]
 		#!# Not clear this exportall is actually in use
-		RewriteRule ^$applicationBaseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|activities|people|rooms)/(search)\.(csv)$ $applicationBaseUrl/index.html?action=$1&do=$2exportall=$3 [L,QSA]
-		RewriteRule ^$applicationBaseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|activities|people|rooms)/([^/]+)/(|timetable.ics|export.html|timetable.csv)$ $applicationBaseUrl/index.html?action=$1&id=$2&do=view&export=$3 [L,QSA]
-		RewriteRule ^$applicationBaseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|activities|people|rooms)/([^/]+)$ $applicationBaseUrl/$1/$2/ [R]
-		RewriteRule ^$applicationBaseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|activities|people|rooms)/([^/]+)/(delete|edit|clone).html$ $applicationBaseUrl/index.html?action=$1&id=$2&do=$3 [L,QSA]
-		RewriteRule ^$applicationBaseUrl/(bookings)/([-,0-9]*[0-9])/$ $applicationBaseUrl/index.html?action=$1&id=$2&do=view [L,QSA]
-		RewriteRule ^$applicationBaseUrl/(bookings)/([-,0-9]*[0-9])$ $applicationBaseUrl/$1/$2/ [R]
+		RewriteRule ^$baseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|activities|people|rooms)/(search)\.(csv)$ $baseUrl/index.html?action=$1&do=$2exportall=$3 [L,QSA]
+		RewriteRule ^$baseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|activities|people|rooms)/([^/]+)/(|timetable.ics|export.html|timetable.csv)$ $baseUrl/index.html?action=$1&id=$2&do=view&export=$3 [L,QSA]
+		RewriteRule ^$baseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|activities|people|rooms)/([^/]+)$ $baseUrl/$1/$2/ [R]
+		RewriteRule ^$baseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|activities|people|rooms)/([^/]+)/(delete|edit|clone).html$ $baseUrl/index.html?action=$1&id=$2&do=$3 [L,QSA]
+		RewriteRule ^$baseUrl/(bookings)/([-,0-9]*[0-9])/$ $baseUrl/index.html?action=$1&id=$2&do=view [L,QSA]
+		RewriteRule ^$baseUrl/(bookings)/([-,0-9]*[0-9])$ $baseUrl/$1/$2/ [R]
 	# People view
 	# Other pages
-		RewriteRule ^$applicationBaseUrl/(more|maintenance|clone)\.html$ $applicationBaseUrl/index.html?action=$1 [L,QSA]
+		RewriteRule ^$baseUrl/(more|maintenance|clone)\.html$ $baseUrl/index.html?action=$1 [L,QSA]
+	
 	# Disable all kinds of access restriction on export files (as calendars cannot do Raven authentication)
 	<LocationMatch "\.ics$">
 		Satisfy Any
@@ -69,13 +86,17 @@
 	<LocationMatch "\.csv$">
 		php_value memory_limit 250M
 	</LocationMatch>
+	
 	<Location /robots.txt>
 		Satisfy Any
 		Allow from all
 	</Location>
-	<Location $applicationBaseUrl/today>
+	
+	# Screen display
+	<Location $baseUrl/today>
 		php_value auto_prepend_file none
 		php_value auto_append_file none
 	</Location>
+	
 </Macro>
 
