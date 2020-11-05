@@ -1809,6 +1809,17 @@ class timetables extends frontControllerApplication
 		$jQuery->tabs ($labels, $panes, 0, false, false, $tabsClass = 'tabsflat');
 		$html .= $jQuery->getHtml ();
 		
+		# Add tooltip support, to show the tooltips using a larger and more immediate bubble; see: https://jqueryui.com/tooltip/
+		$html .= "\n\n\n<!-- jQuery UI -->\n" . '<script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>';
+		$html .= "\n\t" . "<script>
+			$(function () {
+				$('div.week ul.bookings div').tooltip ({
+					track: true,
+					classes: {'ui-tooltip': 'tooltip'}
+				});
+			});
+		</script>";
+		
 		# Return the HTML
 		return $html;
 	}
@@ -2424,7 +2435,7 @@ class timetables extends frontControllerApplication
 				'areaOfActivityId' => array ('values' => hierarchy::asIndentedListing ($this->activitiesHierarchy), 'description' => 'If a suitable area of activity is not listed yet, click on &hellip; to add it'),
 				// 'eventTypeId' => array ('copyTo' => 'name', ),
 				'bookedForUserid' => $this->expandablePeopleFieldSpec (),
-				'roomId' => array ('values' => $rooms, ),
+				'roomId' => array ('values' => $rooms, 'truncate' => 70, ),
 				#!# Date bug that /12 as year becomes 0012
 				'date' => array_merge (array ('heading' => array (3 => 'Dates and times'), ), $this->datePickerAttributes ()),
 				'url' => array ('heading' => array (3 => 'Other details'), 'size' => 60, 'placeholder' => 'https://...', 'description' => false, ),
