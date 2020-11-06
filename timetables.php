@@ -1472,12 +1472,17 @@ class timetables extends frontControllerApplication
 		# Start the HTML
 		$html = '';
 		
+		# To avoid clutter, hide old entries from the listing (except admins)
+		$hideFromNew = (!$this->userIsAdministrator);
+		
 		# Get the activities hierarchy
-		$this->activitiesHierarchy = $this->getActivities ();
+		$this->activitiesHierarchy = $this->getActivities (false, false, $hideFromNew);
 		
 		# Create as a hierarchy
 		$html .= "\n<p><strong>Click on an area of activity to view the bookings relevant to it.</strong></p>";
-		$html .= "\n<p>Those areas of activity shown <span class=\"comment\">grayed out</span> are marked as older types not available for new bookings.</p>";
+		if (!$hideFromNew) {
+			$html .= "\n<p>Those areas of activity shown <span class=\"comment\">grayed out</span> are marked as older types not available for new bookings.</p>";
+		}
 		if ($this->userIsEditor && $editorsSeeLinks) {
 			$html .= "\n<p>As an Editor, you can click on the [edit] link to edit its details, or [+] to add a new area of activity within that item.</p>";
 		}
