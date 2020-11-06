@@ -4457,7 +4457,10 @@ class timetables extends frontControllerApplication
 		if ($hideFromNew) {$conditions['hideFromNew'] = NULL;}	// i.e. will become IS NULL
 		$data = $this->databaseConnection->{$databaseFunction} ($this->settings['database'], $table, $conditions, array (), true, $orderBy = 'parentId,name');
 		
-		#!# Natsort the data
+		# Natsort the names within the parentIds, maintaining keys; see: https://stackoverflow.com/a/32461188
+		$keys = array_keys ($data);
+		array_multisort (array_column ($data, 'parentId'), SORT_ASC, array_column ($data, 'name'), SORT_NATURAL, $data);
+		$data = array_combine ($keys, $data);
 		
 		# End if none
 		if (!$data) {
