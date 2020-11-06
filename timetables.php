@@ -207,6 +207,7 @@ class timetables extends frontControllerApplication
 			  `createdOn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Automatic timestamp',
 			  `people` text COLLATE utf8mb4_unicode_ci COMMENT 'People always associated with this activity (usernames, one per line)',
 			  `website` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Website',
+			  `highlighted` TINYINT NULL COMMENT 'Highlight in list?',
 			  `hideFromNew` tinyint DEFAULT NULL COMMENT 'Whether to hide this for new event creation',
 			  PRIMARY KEY (`id`),
 			  UNIQUE KEY `moniker` (`moniker`)
@@ -1482,7 +1483,7 @@ class timetables extends frontControllerApplication
 		}
 		// $html .= '<script type="text/javascript" src="/sitetech/pde.js"></script>';
 		#!# Need to be able to specify that some sections, e.g. year groups under the main taught course section have an expandable arrow by default
-		$html .= hierarchy::asUl ($this->activitiesHierarchy, "{$this->baseUrl}/activities/", ($this->userIsEditor && $editorsSeeLinks ? 'add.html?parent=%s' : ''), ($this->userIsEditor && $editorsSeeLinks ? '%s/edit.html' : ''), 'hideFromNew', $currentNodeId /*, 'hierarchicallisting pde' */);
+		$html .= hierarchy::asUl ($this->activitiesHierarchy, "{$this->baseUrl}/activities/", ($this->userIsEditor && $editorsSeeLinks ? 'add.html?parent=%s' : ''), ($this->userIsEditor && $editorsSeeLinks ? '%s/edit.html' : ''), 'hideFromNew', $currentNodeId, 'hierarchicallisting', $highlightProperty = 'highlighted');
 		
 		# Return the HTML
 		return $html;
@@ -2643,7 +2644,7 @@ class timetables extends frontControllerApplication
 		
 		# Define dataBinding overrides
 		$dataBindingParameters = array (
-			'int1ToCheckbox' => 'Hide',
+			'int1ToCheckbox' => true,
 			'attributes' => array (
 				'parentId' => array ('values' => hierarchy::asIndentedListing ($this->activitiesHierarchy), ),
 				'people' => $this->expandablePeopleFieldSpec (),
