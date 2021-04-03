@@ -430,7 +430,6 @@ class timetables extends frontControllerApplication
 			'timetable.csv'	=> 'csv',
 		);
 		$this->export = (isSet ($_GET['export']) && strlen ($_GET['export']) && isSet ($exportFormats[$_GET['export']]) ? $exportFormats[$_GET['export']] : false);
-		
 	}
 	
 	
@@ -4457,16 +4456,18 @@ class timetables extends frontControllerApplication
 		if ($hideFromNew) {$conditions['hideFromNew'] = NULL;}	// i.e. will become IS NULL
 		$data = $this->databaseConnection->{$databaseFunction} ($this->settings['database'], $table, $conditions, array (), true, $orderBy = 'parentId,name');
 		
-		# Natsort the names within the parentIds, maintaining keys; see: https://stackoverflow.com/a/22812695
-		uasort ($data, function ($a, $b) {
-			return ($a['parentId'] - $b['parentId'])	// If +/- this is returned, else if the same, this returns 0, so falls through to the next condition:
-				?: strnatcmp ($a['name'], $b['name']);
-		});
-		
 		# End if none
 		if (!$data) {
 			$errorHtml = "<p>There are no {$table} entries so far. You may wish to <a href=\"{$this->baseUrl}/{$this->action}/add.html\">add one</a>.</p>";
 			return false;
+		}
+		
+		# Natsort the names within the parentIds, maintaining keys; see: https://stackoverflow.com/a/22812695
+		if (!$id) {		// Apply only to set operations, not single value
+			uasort ($data, function ($a, $b) {
+				return ($a['parentId'] - $b['parentId'])	// If +/- this is returned, else if the same, this returns 0, so falls through to the next condition:
+					?: strnatcmp ($a['name'], $b['name']);
+			});
 		}
 		
 		# Do regrouping as a hierarchy if fetching all data
