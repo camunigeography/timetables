@@ -4110,16 +4110,14 @@ class timetables extends frontControllerApplication
 			}
 		}
 		
-		# Process the form
-		$result = $form->process ($html);
+		# Process the form, or end if not submitted
+		if (!$result = $form->process ($html)) {return false;}
 		
 		# Inject fixed data, which will have been excluded from form widget creation
 		#!# Question of whether this should apply only to edit or add/edit (e.g. case of creator vs last-edited-by)
-		if ($result) {
-			if ($fixedData) {
-				foreach ($fixedData as $key => $value) {
-					$result[$key] = $value;
-				}
+		if ($fixedData) {
+			foreach ($fixedData as $key => $value) {
+				$result[$key] = $value;
 			}
 		}
 		
