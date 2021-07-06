@@ -4872,6 +4872,7 @@ class timetables extends frontControllerApplication
 			'reappear' => true,
 			'requiredFieldIndicator' => false,
 			'picker' => true,
+			'submitButtonText' => 'Submit - preview new bookings &raquo;',
 		));
 		
 		# Source bookings
