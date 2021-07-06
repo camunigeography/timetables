@@ -4876,7 +4876,7 @@ class timetables extends frontControllerApplication
 		));
 		
 		# Source bookings
-		$form->heading (3, 'Copy from... (source bookings)');
+		$form->heading (3, 'Copy from&hellip; (source bookings)');
 		$form->select (array (
 			'name' => 'activityId',
 			'title' => 'Area of activity',
@@ -4900,7 +4900,7 @@ class timetables extends frontControllerApplication
 		$this->checkStartEndDate ($form);
 		
 		# Target bookings
-		$form->heading (3, 'Copy to... (target bookings)');
+		$form->heading (3, 'Copy to&hellip; (target bookings)');
 		$form->datetime (array (
 		    'name'		=> 'shiftdate',
 		    'title'		=> 'Start date becomes',
@@ -5072,21 +5072,15 @@ class timetables extends frontControllerApplication
 		
 		# Take the unfinalised data to deal with start/end date comparisons
 		if ($unfinalisedData = $form->getUnfinalisedData ()) {
-			if ($unfinalisedData['Startdate'] && $unfinalisedData['Enddate']) {
+			if ($unfinalisedData['startdate'] && $unfinalisedData['enddate']) {
 				
 				# Assemble the start & end dates as a number (this would normally be done in ultimateForm in the post-unfinalised data processing section
-				$startDate = (int) str_replace ('-', '', $unfinalisedData['Startdate']);
-				$endDate = (int) str_replace ('-', '', $unfinalisedData['Enddate']);
+				$startDate = (int) str_replace ('-', '', $unfinalisedData['startdate']);
+				$endDate = (int) str_replace ('-', '', $unfinalisedData['enddate']);
 				
-				# Check that the start (and thereby the end date) are after the current date
-				if ($startDate < date ('Ymd')) {
-					$form->registerProblem ('datefuture', 'The start/end dates cannot be retrospective. Please go back and correct this.');
-				} else {
-					
-					# Check that the start date comes before the end date; NB the >= seems to work successfully with comparison of strings including the dash (-) character
-					if ($startDate > $endDate) {
-						$form->registerProblem ('datemismatch', 'The end date must be on or after the start date. Please go back and correct this.');
-					}
+				# Check that the start date comes before the end date; NB the >= seems to work successfully with comparison of strings including the dash (-) character
+				if ($startDate > $endDate) {
+					$form->registerProblem ('datemismatch', 'The end date must be on or after the start date. Please go back and correct this.');
 				}
 			}
 		}
