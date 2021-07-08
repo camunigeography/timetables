@@ -173,9 +173,10 @@ class timetables extends frontControllerApplication
 			'clone' => array (
 				'description' => 'Clone bookings',
 				'url' => 'clone.html',
-				'parent' => 'admin',
+				'parent' => 'more',
 				'subtab' => 'Clone bookings for period',
 				'privilege' => 'userIsEditor',
+				'icon' => 'application_double',
 			),
 		);
 		
@@ -2390,7 +2391,7 @@ class timetables extends frontControllerApplication
 		$actions = array_merge ($mainObjectActions, $otherObjectActions);
 		
 		# Split out standalone pages
-		$standalonePages = array ('today');
+		$standalonePages = array ('today', 'clone');
 		$otherPages = application::array_filter_keys ($actions, $standalonePages);
 		foreach ($standalonePages as $standalonePage) {
 			unset ($actions[$standalonePage]);
@@ -2403,7 +2404,6 @@ class timetables extends frontControllerApplication
 		# Other pages
 		$html .= "\n<p>Other pages:</p>";
 		$html .= $this->actionsListHtml ($otherPages, true, 'boxylist objectlist');
-		
 		
 		# Show the HTML
 		echo $html;
