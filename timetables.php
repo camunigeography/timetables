@@ -3520,7 +3520,7 @@ class timetables extends frontControllerApplication
 			'database'							=> $this->settings['database'],
 			'table'								=> $table,
 			'dataBindingParameters'				=> $dataBindingParameters,
-			'orderBy'							=> 'id',
+			'orderBy'							=> 'id' . ($this->action == 'bookings' ? ' DESC' : ''),
 			'mainSubjectField'					=> 'name',
 			// 'excludeFields' is already appearing through $dataBindingParameters
 			'showFields'						=> array (),
