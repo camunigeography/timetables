@@ -1895,6 +1895,7 @@ class timetables extends frontControllerApplication
 				'startTime' => $booking['startTime'],
 				'untilTime' => $booking['untilTime'],
 				'location' => $booking['roomName'] . ($booking['buildingName'] ? ', ' . $booking['buildingName'] : ''),
+				'url' => $booking['url'],
 				'description' => ($description ? implode ('. ', $description) . '.' : ''),		// Empty string if none,
 			);
 		}
