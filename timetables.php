@@ -151,7 +151,7 @@ class timetables extends frontControllerApplication
 				'description' => 'Lobby screen page',
 				'url' => 'today/',
 				'parent' => 'more',
-				'subtab' => 'Lobby screen page',
+				'subtab' => 'Lobby screen',
 				'icon' => 'picture_empty',
 				'export' => true,
 			),
@@ -174,9 +174,23 @@ class timetables extends frontControllerApplication
 				'description' => 'Clone bookings',
 				'url' => 'clone.html',
 				'parent' => 'more',
-				'subtab' => 'Clone bookings for period',
+				'subtab' => 'Clone bookings',
 				'privilege' => 'userIsEditor',
 				'icon' => 'application_double',
+			),
+			'lecturecapture' => array (
+				'description' => 'Export Lecture Capture list',
+				'url' => 'lecturecapture.html',
+				'privilege' => 'userIsEditor',
+				'parent' => 'more',
+				'subtab' => 'Lecture Capture',
+				'icon' => 'control_end_blue',
+			),
+			'lecturecapturexml' => array (
+				'description' => 'Export Lecture Capture list',
+				'url' => 'lecturecapture.xml',
+				'privilege' => 'userIsEditor',
+				'export' => true,
 			),
 		);
 		
@@ -208,6 +222,7 @@ class timetables extends frontControllerApplication
 			  `createdOn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Automatic timestamp',
 			  `people` text COLLATE utf8mb4_unicode_ci COMMENT 'People always associated with this activity (usernames, one per line)',
 			  `website` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Website',
+			  `lectureCaptureFolder` VARCHAR(255) NULL COMMENT 'Lecture capture folder',
 			  `highlighted` TINYINT NULL COMMENT 'Highlight in list?',
 			  `hideFromNew` tinyint DEFAULT NULL COMMENT 'Whether to hide this for new event creation',
 			  PRIMARY KEY (`id`),
@@ -227,6 +242,7 @@ class timetables extends frontControllerApplication
 			  `untilTime` time NOT NULL COMMENT 'Finishing time (until)',
 			  `series` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Series ID',
 			  `url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Web link, if any',
+			  `lectureCapture` TINYINT NULL DEFAULT NULL COMMENT 'Lecture capture?',
 			  `notes` text COLLATE utf8mb4_unicode_ci COMMENT 'Miscellaneous notes',
 			  `draft` tinyint DEFAULT NULL COMMENT 'Draft booking (hidden for now)?',
 			  `requestedBy` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Requested booking by',
@@ -284,7 +300,8 @@ class timetables extends frontControllerApplication
 			  `buildingId` int(11) DEFAULT NULL COMMENT 'Building',
 			  `moniker` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'URL component (must be unique)',
 			  `note` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Note to other Editors',
-			  `ignoreClashes` TINYINT NULL DEFAULT NULL COMMENT 'Ignore clashes in clash-checking?'
+			  `ignoreClashes` TINYINT NULL DEFAULT NULL COMMENT 'Ignore clashes in clash-checking?',
+			  `lectureCaptureRecorderName` VARCHAR(255) NULL COMMENT 'Lecture capture recorder name',
 			  `longitude` float(11,6) DEFAULT NULL COMMENT 'Map longitude',
 			  `latitude` float(10,6) DEFAULT NULL COMMENT 'Map latitude',
 			  `universityMapUrl` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'University Map link',
@@ -330,7 +347,9 @@ class timetables extends frontControllerApplication
 			  `usersAutocomplete` VARCHAR(255) NULL COMMENT 'Users autocomplete URL',
 			  `usersExternalUrl` VARCHAR(255) NULL COMMENT 'Users database UI external URL',
 			  `calendarName` VARCHAR(255) NOT NULL DEFAULT 'calendar' COMMENT 'iCal calendar name',
-			  `wideCss` VARCHAR(255) NULL COMMENT 'CSS for wide layout'
+			  `wideCss` VARCHAR(255) NULL COMMENT 'CSS for wide layout',
+			  `lectureCaptureStartMinutes` INT NOT NULL DEFAULT '5' COMMENT 'Lecture capture - exclude minutes at start',
+			  `lectureCaptureEndMinutes` INT NOT NULL DEFAULT '5' COMMENT 'Lecture capture - exclude minutes at end',
 			  PRIMARY KEY (`id`)
 			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8mb4_unicode_ci COMMENT='Settings';
 			
@@ -1630,6 +1649,7 @@ class timetables extends frontControllerApplication
 				areaOfActivity.name AS activityName,
 				'' AS activityNamePrefix,	/* Will be populated below */
 				areaOfActivity.moniker AS activityMoniker,
+				lectureCaptureFolder,
 				bookedForUserid,	/* This is basically a meaningless string at present - will then be replaced below by substituteUseridTokensToNames() */
 				bookedByUserid,
 				IF(ISNULL(peopleBookedBy.name),bookedByUserid,peopleBookedBy.name) AS bookedByUseridFormatted,
@@ -1638,6 +1658,7 @@ class timetables extends frontControllerApplication
 				UNIX_TIMESTAMP(bookings.createdAt) as createdAt,
 				rooms.name AS roomName,
 				rooms.moniker AS roomMoniker,
+				lectureCaptureRecorderName,
 				buildings.name AS buildingName,
 				url
 			FROM bookings
@@ -2392,7 +2413,7 @@ class timetables extends frontControllerApplication
 		$actions = array_merge ($mainObjectActions, $otherObjectActions);
 		
 		# Split out standalone pages
-		$standalonePages = array ('today', 'clone');
+		$standalonePages = array ('today', 'clone', 'lecturecapture');
 		$otherPages = application::array_filter_keys ($actions, $standalonePages);
 		foreach ($standalonePages as $standalonePage) {
 			unset ($actions[$standalonePage]);
@@ -3148,7 +3169,8 @@ class timetables extends frontControllerApplication
 		# Add export link
 		if (!$exportFormat) {
 			if ($table == 'bookings') {		// Currently only supported for bookings
-				$html .= "\n<p class=\"right\"><a href=\"{$this->baseUrl}/{$table}/{$table}.csv\">Export all</a></p>";
+				$html .= "\n<p class=\"right\"><a href=\"{$this->baseUrl}/{$table}/{$table}.csv\">" . $this->icon ('page_white_excel') . 'Export all</a></p>';
+				$html .= "\n<p class=\"right\"><a href=\"{$this->baseUrl}/lecturecapture.html\">" . $this->icon ('control_end_blue') . 'Export Lecture Capture list</a></p>';
 			}
 		}
 		
@@ -5131,6 +5153,110 @@ class timetables extends frontControllerApplication
 		#!# This can create "Duplicate entry 'Forename surname' for key 'PRIMARY'" if there is both "Forename Surname" (capitalised) and "Forename surname" (uncapitalised) present; this can be tidied using Consolidate user entries twice
 		$this->databaseConnection->insertMany ($this->settings['database'], 'people', $inserts, false, false, $emptyToNull = false);
 		$this->updatePeopleNames ();
+	}
+	
+	
+	# Lecture Capture page
+	public function lecturecapture ()
+	{
+		# Start the HTML
+		$html = '';
+		
+		# Introduction
+		$html .= "\n" . '<p>This page enables you to import all the bookings that have lecture capture enabled into Panopto, using the Panopto Bulk Scheduling Tool.</p>';
+		$html .= "\n" . '<p>The tool must first be installed on your computer, as per the <a href="https://support.panopto.com/s/article/scheduling-tool" target="_blank">Panopto Bulk Scheduling Tool installation instructions</a>.</p>';
+		$html .= "\n" . '<p>You must also have a username and password that is enabled with the Videographer privilege.</p>';
+		
+		# Get the bookings
+		$bookings = $this->getLectureCaptureBookings ();
+		
+		# Heading
+		$html .= '<h3>Obtain the export file</h3>';
+		
+		# If there are errors, list them
+		if (!$bookings) {
+			$html .= "\n" . '<p>There are no bookings with lecture capture enabled at present.</p>';
+			echo $html;
+			return;
+		}
+		
+		# Ensure all bookings have a recorder and folder specified; errors are indexed by key to avoid the same room/activity appearing multiple times
+		$errors = array ();
+		foreach ($bookings as $booking) {
+			if (!strlen ($booking['lectureCaptureRecorderName'])) {
+				$errors['room-' . $booking['roomMoniker']] = "Booking <a href=\"{$this->baseUrl}/bookings/{$booking['id']}/edit.html\">#{$booking['id']}</a> is in room <a href=\"{$this->baseUrl}/rooms/{$booking['roomMoniker']}/edit.html\">" . htmlspecialchars ($booking['roomName']) . '</a>, which needs a Lecture Capture recorder name added to it.';
+			}
+			if (!strlen ($booking['lectureCaptureFolder'])) {
+				$errors['activity-' . $booking['activityMoniker']] = "Booking <a href=\"{$this->baseUrl}/bookings/{$booking['id']}/edit.html\">#{$booking['id']}</a> is for activity <a href=\"{$this->baseUrl}/activities/{$booking['activityMoniker']}/edit.html\">" . htmlspecialchars ($booking['activityName']) . '</a> which needs a Lecture Capture folder added to it.';
+			}
+		}
+		
+		# If there are errors, list them
+		if ($errors) {
+			$html .= "\n" . '<p>The lecture capture data cannot be downloaded as not all the bookings have sufficient lecture capture details added yet:</p>';
+			$html .= "\n" . application::htmlUl ($errors, 0, 'spaced');
+			echo $html;
+			return;
+		}
+		
+		# Download link
+		$html .= "\n<br />";
+		$html .= "\n<p class=\"actions\"><a href=\"{$this->baseUrl}/lecturecapture.xml\">" . $this->icon ('control_end_blue') . 'Export Lecture Capture list file</a></p>';
+		
+		# Show the HTML
+		echo $html;
+	}
+	
+	
+	# Function to get lecture capture bookings
+	public function getLectureCaptureBookings ()
+	{
+		# Get the bookings
+		$this->userIsEditor = true;		// Workaround for getBookings having a built-in WHERE clause
+		$where = array ();
+		$where[] = 'lectureCapture = 1';
+		$where[] = '(draft != 1 OR draft IS NULL)';
+		$where[] = "CONCAT(date,' ',startTime) >= NOW()";
+		$bookings = $this->getBookings ($where);
+		
+		# Return the data
+		return $bookings;
+	}
+	
+	
+	# Lecture Capture export to Panopto; see: https://support.panopto.com/s/article/scheduling-tool
+	public function lecturecapturexml ()
+	{
+		# Get the bookings
+		$bookings = $this->getLectureCaptureBookings ();
+		
+		# Construct the XML
+		$xml  = '<?xml version="1.0" encoding="UTF-8"?>';
+		$xml .= "\n\n" . '<RecorderScheduleImport xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">';
+		$xml .= "\n\t" . '<RecorderSchedules>';
+		foreach ($bookings as $booking) {
+			$xml .= "\n\t\t" . '<RecorderSchedule>';
+			$xml .= "\n\t\t\t" . '<Class>' . htmlspecialchars ($booking['name'] . ' - ' . htmlspecialchars (strip_tags ($booking['bookedForUserid'])) . ' - ' . date ('jS F Y', strtotime ($booking['startDate'] . ' 12:00:00'))) . '</Class>';
+			$xml .= "\n\t\t\t" . '<Classroom>' . htmlspecialchars ($booking['lectureCaptureRecorderName']) . '</Classroom>';
+			$xml .= "\n\t\t\t" . '<RecordingDate>' . date ('d/m/Y', strtotime ($booking['startDate'] . ' 12:00:00')) . '</RecordingDate>';	// E.g. 30/06/2021 for 30th June 2021 - note date order is not as shown in documentation webpage
+			$xml .= "\n\t\t\t" . '<RecordingStartTime>' . date ('g:i A', ($booking['startTime'] + ($this->settings['lectureCaptureStartMinutes'] * 60))) . '</RecordingStartTime>';
+			$xml .= "\n\t\t\t" . '<RecordingEndTime>' . date ('g:i A', ($booking['untilTime'] - ($this->settings['lectureCaptureEndMinutes'] * 60))) . '</RecordingEndTime>';
+			$xml .= "\n\t\t\t" . '<Presenter>' . htmlspecialchars (strip_tags ($booking['bookedForUserid'])) . '</Presenter>';
+			$xml .= "\n\t\t\t" . '<CourseTitle>' . htmlspecialchars ($booking['lectureCaptureFolder']) . '</CourseTitle>';
+			$xml .= "\n\t\t" . '</RecorderSchedule>';
+		}
+		$xml .= "\n\t" . '</RecorderSchedules>';
+		$xml .= "\n" . '</RecorderScheduleImport>';
+		
+		# XML header
+		header ('Content-Type: application/xml; charset=utf-8');
+		
+		# Force as download
+		$filename = __FUNCTION__ . '_savedAt' . date ('Ymd-His') . '.xml';
+		header ('Content-Disposition: attachment; filename="' . $filename . '"');
+		
+		# Transmit the XML
+		echo $xml;
 	}
 	
 	

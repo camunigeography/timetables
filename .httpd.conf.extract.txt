@@ -71,6 +71,9 @@
 		RewriteRule ^$baseUrl/(bookings)/([-,0-9]*[0-9])/$ $baseUrl/index.html?action=$1&id=$2&do=view [L,QSA]
 		RewriteRule ^$baseUrl/(bookings)/([-,0-9]*[0-9])$ $baseUrl/$1/$2/ [R]
 	# People view
+	# Lecture capture
+		RewriteRule ^$baseUrl/(lecturecapture)\.html$ $baseUrl/index.html?action=$1 [L,QSA]
+		RewriteRule ^$baseUrl/(lecturecapture)\.xml$ $baseUrl/index.html?action=$1xml [L,QSA]
 	# Other pages
 		RewriteRule ^$baseUrl/(more|maintenance|clone)\.html$ $baseUrl/index.html?action=$1 [L,QSA]
 	
@@ -79,7 +82,7 @@
 		Satisfy Any
 		Allow from all
 	</LocationMatch>
-	<LocationMatch "\.(ics|csv)$">
+	<LocationMatch "\.(ics|csv|xml)$">
 		php_value auto_prepend_file none
 		php_value auto_append_file none
 	</LocationMatch>
