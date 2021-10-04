@@ -5183,6 +5183,13 @@ class timetables extends frontControllerApplication
 		$html .= "\n<br />";
 		$html .= "\n<p class=\"actions\"><a href=\"{$this->baseUrl}/lecturecapture.xml\">" . $this->icon ('control_end_blue') . 'Export Lecture Capture list file</a></p>';
 		
+		# If the user is admin, show the debug output
+		if ($this->userIsAdministrator) {
+			$html .= '<h3>Entries</h3>';
+			$total = count ($bookings);
+			$html .= "\n<p>The following entries ({$total}) match:</p>";
+			$html .= application::htmlTable ($bookings);
+		}
 		# Show the HTML
 		echo $html;
 	}
