@@ -1134,7 +1134,7 @@ class timetables extends frontControllerApplication
 		
 		# Now deal with the areas of activity they are involved in
 		if ($areasOfActivityInvolvedIds = $this->getAreasOfActivityInvolved ($userIds)) {
-			$subclauses[] = 'areaOfActivityId IN (' . implode (',', $areasOfActivityInvolvedIds) . ')';	// These are numeric so do not need to be quote
+			$subclauses[] = 'areaOfActivityId IN (' . implode (',', $areasOfActivityInvolvedIds) . ')';	// These are numeric so do not need to be quoted
 		}
 		
 		# Compile the result
@@ -1616,7 +1616,7 @@ class timetables extends frontControllerApplication
 	
 	
 	# Function to get the bookings
-	private function getBookings ($where = array ())
+	private function getBookings ($where = array (), $hyperlinkNames = true)
 	{
 		# If the user is not an editor, exclude draft bookings
 		if (!$this->userIsEditor) {
@@ -1680,7 +1680,7 @@ class timetables extends frontControllerApplication
 		// application::dumpData ($this->databaseConnection->error ());
 		
 		# Substitute-in names
-		$bookings = $this->substituteUseridTokensToNames ($bookings, array ('bookedForUserid'), true);
+		$bookings = $this->substituteUseridTokensToNames ($bookings, array ('bookedForUserid'), $hyperlinkNames);
 		
 		# Add in shortnames for the area of activity
 		$bookings = $this->substituteAreaOfActivityShortnames ($bookings);
