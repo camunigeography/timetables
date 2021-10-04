@@ -5217,7 +5217,7 @@ class timetables extends frontControllerApplication
 		$where[] = 'lectureCapture = 1';
 		$where[] = '(draft != 1 OR draft IS NULL)';
 		$where[] = "CONCAT(date,' ',startTime) >= NOW()";
-		$bookings = $this->getBookings ($where);
+		$bookings = $this->getBookings ($where, $hyperlinkNames = false);
 		
 		# Return the data
 		return $bookings;
@@ -5236,12 +5236,12 @@ class timetables extends frontControllerApplication
 		$xml .= "\n\t" . '<RecorderSchedules>';
 		foreach ($bookings as $booking) {
 			$xml .= "\n\t\t" . '<RecorderSchedule>';
-			$xml .= "\n\t\t\t" . '<Class>' . htmlspecialchars ($booking['name'] . ' - ' . htmlspecialchars (strip_tags ($booking['bookedForUserid'])) . ' - ' . date ('jS F Y', strtotime ($booking['startDate'] . ' 12:00:00'))) . '</Class>';
+			$xml .= "\n\t\t\t" . '<Class>' . htmlspecialchars ($booking['name'] . ' - ' . htmlspecialchars ($booking['bookedForUserid']) . ' - ' . date ('jS F Y', strtotime ($booking['startDate'] . ' 12:00:00'))) . '</Class>';
 			$xml .= "\n\t\t\t" . '<Classroom>' . htmlspecialchars ($booking['lectureCaptureRecorderName']) . '</Classroom>';
 			$xml .= "\n\t\t\t" . '<RecordingDate>' . date ('d/m/Y', strtotime ($booking['startDate'] . ' 12:00:00')) . '</RecordingDate>';	// E.g. 30/06/2021 for 30th June 2021 - note date order is not as shown in documentation webpage
 			$xml .= "\n\t\t\t" . '<RecordingStartTime>' . date ('g:i A', ($booking['startTime'] + ($this->settings['lectureCaptureStartMinutes'] * 60))) . '</RecordingStartTime>';
 			$xml .= "\n\t\t\t" . '<RecordingEndTime>' . date ('g:i A', ($booking['untilTime'] - ($this->settings['lectureCaptureEndMinutes'] * 60))) . '</RecordingEndTime>';
-			$xml .= "\n\t\t\t" . '<Presenter>' . htmlspecialchars (strip_tags ($booking['bookedForUserid'])) . '</Presenter>';
+			$xml .= "\n\t\t\t" . '<Presenter>' . htmlspecialchars ($booking['bookedForUserid']) . '</Presenter>';
 			$xml .= "\n\t\t\t" . '<CourseTitle>' . htmlspecialchars ($booking['lectureCaptureFolder']) . '</CourseTitle>';
 			$xml .= "\n\t\t" . '</RecorderSchedule>';
 		}
