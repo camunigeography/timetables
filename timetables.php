@@ -242,7 +242,6 @@ class timetables extends frontControllerApplication
 			  `untilTime` time NOT NULL COMMENT 'Finishing time (until)',
 			  `series` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Series ID',
 			  `url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Web link, if any',
-			  `lectureCapture` TINYINT NULL DEFAULT NULL COMMENT 'Lecture capture?',
 			  `notes` text COLLATE utf8mb4_unicode_ci COMMENT 'Miscellaneous notes',
 			  `draft` tinyint DEFAULT NULL COMMENT 'Draft booking (hidden for now)?',
 			  `requestedBy` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Requested booking by',
@@ -5180,25 +5179,6 @@ class timetables extends frontControllerApplication
 			return;
 		}
 		
-		# Ensure all bookings have a recorder and folder specified; errors are indexed by key to avoid the same room/activity appearing multiple times
-		$errors = array ();
-		foreach ($bookings as $booking) {
-			if (!strlen ($booking['lectureCaptureRecorderName'])) {
-				$errors['room-' . $booking['roomMoniker']] = "Booking <a href=\"{$this->baseUrl}/bookings/{$booking['id']}/edit.html\">#{$booking['id']}</a> is in room <a href=\"{$this->baseUrl}/rooms/{$booking['roomMoniker']}/edit.html\">" . htmlspecialchars ($booking['roomName']) . '</a>, which needs a Lecture Capture recorder name added to it.';
-			}
-			if (!strlen ($booking['lectureCaptureFolder'])) {
-				$errors['activity-' . $booking['activityMoniker']] = "Booking <a href=\"{$this->baseUrl}/bookings/{$booking['id']}/edit.html\">#{$booking['id']}</a> is for activity <a href=\"{$this->baseUrl}/activities/{$booking['activityMoniker']}/edit.html\">" . htmlspecialchars ($booking['activityName']) . '</a> which needs a Lecture Capture folder added to it.';
-			}
-		}
-		
-		# If there are errors, list them
-		if ($errors) {
-			$html .= "\n" . '<p>The lecture capture data cannot be downloaded as not all the bookings have sufficient lecture capture details added yet:</p>';
-			$html .= "\n" . application::htmlUl ($errors, 0, 'spaced');
-			echo $html;
-			return;
-		}
-		
 		# Download link
 		$html .= "\n<br />";
 		$html .= "\n<p class=\"actions\"><a href=\"{$this->baseUrl}/lecturecapture.xml\">" . $this->icon ('control_end_blue') . 'Export Lecture Capture list file</a></p>';
@@ -5211,10 +5191,11 @@ class timetables extends frontControllerApplication
 	# Function to get lecture capture bookings
 	public function getLectureCaptureBookings ()
 	{
-		# Get the bookings
+		# Get the bookings, where there is both a lecture capture folder set directly for the area of activity (NB hierarchy not currently supported), and the venue has a recorder set
 		$this->userIsEditor = true;		// Workaround for getBookings having a built-in WHERE clause
 		$where = array ();
-		$where[] = 'lectureCapture = 1';
+		$where[] = 'lectureCaptureFolder IS NOT NULL';
+		$where[] = 'lectureCaptureRecorderName IS NOT NULL';
 		$where[] = '(draft != 1 OR draft IS NULL)';
 		$where[] = "CONCAT(date,' ',startTime) >= NOW()";
 		$bookings = $this->getBookings ($where, $hyperlinkNames = false);
