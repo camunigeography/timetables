@@ -242,6 +242,7 @@ class timetables extends frontControllerApplication
 			  `untilTime` time NOT NULL COMMENT 'Finishing time (until)',
 			  `series` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Series ID',
 			  `url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Web link, if any',
+			  `lectureCapture` ENUM('','Explicitly disable') NULL COMMENT 'Lecture capture',
 			  `notes` text COLLATE utf8mb4_unicode_ci COMMENT 'Miscellaneous notes',
 			  `draft` tinyint DEFAULT NULL COMMENT 'Draft booking (hidden for now)?',
 			  `requestedBy` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Requested booking by',
@@ -5203,6 +5204,7 @@ class timetables extends frontControllerApplication
 		$where = array ();
 		$where[] = 'lectureCaptureFolder IS NOT NULL';
 		$where[] = 'lectureCaptureRecorderName IS NOT NULL';
+		$where[] = "(lectureCapture IS NULL OR lectureCapture = '')";	// I.e. not 'Explicitly disable'
 		$where[] = '(draft != 1 OR draft IS NULL)';
 		$where[] = "CONCAT(date,' ',startTime) >= NOW()";
 		$bookings = $this->getBookings ($where, $hyperlinkNames = false);
