@@ -5209,6 +5209,25 @@ class timetables extends frontControllerApplication
 		$where[] = "CONCAT(date,' ',startTime) >= NOW()";
 		$bookings = $this->getBookings ($where, $hyperlinkNames = false);
 		
+		# Adjust the booking start/finish times for lecture capture if required
+		foreach ($bookings as $id => $booking) {
+			$bookings[$id]['startTime'] += ($this->settings['lectureCaptureStartMinutes'] * 60);
+			$bookings[$id]['untilTime'] -= ($this->settings['lectureCaptureEndMinutes'] * 60);
+		}
+		
+		# Assemble only fields in use
+		foreach ($bookings as $id => $booking) {
+			$bookings[$id] = array (
+				'Class'					=> $booking['name'] . ' - ' . $booking['bookedForUserid'] . ' - ' . date ('jS F Y', strtotime ($booking['startDate'] . ' 12:00:00')),
+				'Classroom'				=> $booking['lectureCaptureRecorderName'],
+				'RecordingDate'			=> date ('d/m/Y', strtotime ($booking['startDate'] . ' 12:00:00')),		// E.g. 30/06/2021 for 30th June 2021 - note date order is not as shown in documentation webpage
+				'RecordingStartTime'	=> date ('g:i A', $booking['startTime']),
+				'RecordingEndTime'		=> date ('g:i A', $booking['untilTime']),
+				'Presenter'				=> $booking['bookedForUserid'],
+				'CourseTitle'			=> $booking['lectureCaptureFolder'],
+			);
+		}
+		
 		# Return the data
 		return $bookings;
 	}
@@ -5226,13 +5245,13 @@ class timetables extends frontControllerApplication
 		$xml .= "\n\t" . '<RecorderSchedules>';
 		foreach ($bookings as $booking) {
 			$xml .= "\n\t\t" . '<RecorderSchedule>';
-			$xml .= "\n\t\t\t" . '<Class>' . htmlspecialchars ($booking['name'] . ' - ' . $booking['bookedForUserid'] . ' - ' . date ('jS F Y', strtotime ($booking['startDate'] . ' 12:00:00')), ENT_NOQUOTES) . '</Class>';
-			$xml .= "\n\t\t\t" . '<Classroom>' . htmlspecialchars ($booking['lectureCaptureRecorderName'], ENT_NOQUOTES) . '</Classroom>';
-			$xml .= "\n\t\t\t" . '<RecordingDate>' . date ('d/m/Y', strtotime ($booking['startDate'] . ' 12:00:00')) . '</RecordingDate>';	// E.g. 30/06/2021 for 30th June 2021 - note date order is not as shown in documentation webpage
-			$xml .= "\n\t\t\t" . '<RecordingStartTime>' . date ('g:i A', ($booking['startTime'] + ($this->settings['lectureCaptureStartMinutes'] * 60))) . '</RecordingStartTime>';
-			$xml .= "\n\t\t\t" . '<RecordingEndTime>' . date ('g:i A', ($booking['untilTime'] - ($this->settings['lectureCaptureEndMinutes'] * 60))) . '</RecordingEndTime>';
-			$xml .= "\n\t\t\t" . '<Presenter>' . htmlspecialchars ($booking['bookedForUserid'], ENT_NOQUOTES) . '</Presenter>';
-			$xml .= "\n\t\t\t" . '<CourseTitle>' . htmlspecialchars ($booking['lectureCaptureFolder'], ENT_NOQUOTES) . '</CourseTitle>';
+			$xml .= "\n\t\t\t" . '<Class>' . htmlspecialchars ($booking['Class'], ENT_NOQUOTES) . '</Class>';
+			$xml .= "\n\t\t\t" . '<Classroom>' . htmlspecialchars ($booking['Classroom'], ENT_NOQUOTES) . '</Classroom>';
+			$xml .= "\n\t\t\t" . '<RecordingDate>' . $booking['RecordingDate'] . '</RecordingDate>';
+			$xml .= "\n\t\t\t" . '<RecordingStartTime>' . $booking['RecordingStartTime'] . '</RecordingStartTime>';
+			$xml .= "\n\t\t\t" . '<RecordingEndTime>' . $booking['RecordingEndTime'] . '</RecordingEndTime>';
+			$xml .= "\n\t\t\t" . '<Presenter>' . htmlspecialchars ($booking['Presenter'], ENT_NOQUOTES) . '</Presenter>';
+			$xml .= "\n\t\t\t" . '<CourseTitle>' . htmlspecialchars ($booking['CourseTitle'], ENT_NOQUOTES) . '</CourseTitle>';
 			$xml .= "\n\t\t" . '</RecorderSchedule>';
 		}
 		$xml .= "\n\t" . '</RecorderSchedules>';
