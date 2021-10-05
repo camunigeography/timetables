@@ -5245,13 +5245,9 @@ class timetables extends frontControllerApplication
 		$xml .= "\n\t" . '<RecorderSchedules>';
 		foreach ($bookings as $booking) {
 			$xml .= "\n\t\t" . '<RecorderSchedule>';
-			$xml .= "\n\t\t\t" . '<Class>' . htmlspecialchars ($booking['Class'], ENT_NOQUOTES) . '</Class>';
-			$xml .= "\n\t\t\t" . '<Classroom>' . htmlspecialchars ($booking['Classroom'], ENT_NOQUOTES) . '</Classroom>';
-			$xml .= "\n\t\t\t" . '<RecordingDate>' . $booking['RecordingDate'] . '</RecordingDate>';
-			$xml .= "\n\t\t\t" . '<RecordingStartTime>' . $booking['RecordingStartTime'] . '</RecordingStartTime>';
-			$xml .= "\n\t\t\t" . '<RecordingEndTime>' . $booking['RecordingEndTime'] . '</RecordingEndTime>';
-			$xml .= "\n\t\t\t" . '<Presenter>' . htmlspecialchars ($booking['Presenter'], ENT_NOQUOTES) . '</Presenter>';
-			$xml .= "\n\t\t\t" . '<CourseTitle>' . htmlspecialchars ($booking['CourseTitle'], ENT_NOQUOTES) . '</CourseTitle>';
+			foreach ($booking as $key => $value) {
+				$xml .= "\n\t\t\t" . "<{$key}>" . htmlspecialchars ($value, ENT_NOQUOTES) . "</{$key}>";
+			}
 			$xml .= "\n\t\t" . '</RecorderSchedule>';
 		}
 		$xml .= "\n\t" . '</RecorderSchedules>';
