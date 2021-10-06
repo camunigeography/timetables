@@ -350,6 +350,7 @@ class timetables extends frontControllerApplication
 			  `wideCss` VARCHAR(255) NULL COMMENT 'CSS for wide layout',
 			  `lectureCaptureStartMinutes` INT NOT NULL DEFAULT '5' COMMENT 'Lecture capture - exclude minutes at start',
 			  `lectureCaptureEndMinutes` INT NOT NULL DEFAULT '5' COMMENT 'Lecture capture - exclude minutes at end',
+			  `lectureCaptureTitlePrefix` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Lecture capture title prefix',
 			  PRIMARY KEY (`id`)
 			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8mb4_unicode_ci COMMENT='Settings';
 			
@@ -5217,7 +5218,7 @@ class timetables extends frontControllerApplication
 		# Assemble only fields in use
 		foreach ($bookings as $id => $booking) {
 			$bookings[$id] = array (
-				'Class'					=> $booking['name'] . ' - ' . $booking['bookedForUserid'] . ' - ' . date ('jS F Y', strtotime ($booking['startDate'] . ' 12:00:00')),
+				'Class'					=> ($this->settings['lectureCaptureTitlePrefix'] ? $this->settings['lectureCaptureTitlePrefix'] . ' ' : '') . $booking['name'] . ' - ' . $booking['bookedForUserid'] . ' - ' . date ('jS F Y', strtotime ($booking['startDate'] . ' 12:00:00')),
 				'Classroom'				=> $booking['lectureCaptureRecorderName'],
 				'RecordingDate'			=> date ('d/m/Y', strtotime ($booking['startDate'] . ' 12:00:00')),		// E.g. 30/06/2021 for 30th June 2021 - note date order is not as shown in documentation webpage
 				'RecordingStartTime'	=> date ('g:i A', $booking['startTime']),
