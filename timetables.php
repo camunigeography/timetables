@@ -2646,7 +2646,7 @@ class timetables extends frontControllerApplication
 		# Define dataBinding overrides
 		$dataBindingParameters = array (
 			'attributes' => array (
-				'moniker' => array ('regexp' => '^([-0-9a-z]{1,40})$', 'prepend' => $this->baseUrl . '/' . __FUNCTION__ . '/', 'append' => '/', 'size' => 20, ),
+				'moniker' => array ('regexp' => '^([-0-9a-z]{1,40})$', 'prepend' => $this->baseUrl . '/' . __FUNCTION__ . '/', 'append' => '/', 'size' => 20, 'description' => 'A friendly web address, using lower-case letters / numbers only', ),
 			),
 		);
 		
