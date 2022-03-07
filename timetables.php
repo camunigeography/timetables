@@ -3763,6 +3763,15 @@ class timetables extends frontControllerApplication
 		# Get the data for the item or end
 		if (!$data = $this->crudGetDataFromGetId ($table, $id, $html)) {return $html;}
 		
+		# Prevent deletion of areas of activity when it has bookings
+		if ($table == 'areaOfActivity') {
+			if ($hasBookings = $this->databaseConnection->select ($this->settings['database'], 'bookings', array ('areaOfActivityId' => $data['id']))) {
+				$html  = "\n<p>You cannot delete this area of activity because it has <a href=\"{$this->baseUrl}/bookings/search.html?areaOfActivityId={$data['id']}\">bookings</a> attached to it.</p>";
+				$html .= "\n<p>Please instead <a href=\"{$this->baseUrl}/activities/{$data['moniker']}/edit.html#form_hideFromNew_1\">go to the editing page</a> and set to hide it.</p>";
+				return $html;
+			}
+		}
+		
 		# If there is a series field and it contains a value, run in series mode
 		$seriesListing = $this->seriesListing ($data, $table);
 		
