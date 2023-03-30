@@ -4631,11 +4631,15 @@ class timetables extends frontControllerApplication
 				GROUP BY people.id
 				ORDER BY surname,forename,id
 			;";
-			if (!$data = $this->databaseConnection->getData ($query, "{$this->settings['database']}.people")) {return array ();}
+			if (!$data = $this->databaseConnection->getData ($query, "{$this->settings['database']}.people")) {
+				return array ();
+			}
 			
 		# Otherwise, get all
 		} else {
-			if (!$data = $this->databaseConnection->select ($this->settings['database'], 'people', $conditions, array (), true, 'surname,forename,id')) {return array ();}
+			if (!$data = $this->databaseConnection->select ($this->settings['database'], 'people', $conditions, array (), true, 'surname,forename,id')) {
+				return array ();
+			}
 		}
 		
 		# Format if required
@@ -4666,7 +4670,6 @@ class timetables extends frontControllerApplication
 				if (!$isRealUsername || !$hasName) {
 					$list[$userId] .= " <a href=\"{$this->baseUrl}/people/consolidate/" . htmlspecialchars (urlencode ($userId)) . "/\" class=\"consolidate\">[Consolidate &hellip;]</a>";
 					$list[$userId] .= " <a href=\"{$this->baseUrl}/bookings/search.html?bookedForUserid=" . htmlspecialchars (urlencode ($userId)) . "\" class=\"consolidate\">[Bookings]</a>";
-					
 				}
 			}
 			
@@ -5196,7 +5199,7 @@ class timetables extends frontControllerApplication
 		$html .= "\n<p class=\"actions\"><a href=\"{$this->baseUrl}/lecturecapture.xml\">" . $this->icon ('control_end_blue') . 'Export Lecture Capture list file</a></p>';
 		
 		# Show table equivalent
-		$html .= '<h3>Entries</h3>';
+		$html .= "\n" . '<h3>Entries</h3>';
 		$total = count ($bookings);
 		$html .= "\n<p>The data file contains the following following entries ({$total}):</p>";
 		$html .= application::htmlTable ($bookings);
