@@ -302,8 +302,6 @@ class timetables extends frontControllerApplication
 			  `note` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Note to other Editors',
 			  `ignoreClashes` TINYINT NULL DEFAULT NULL COMMENT 'Ignore clashes in clash-checking?',
 			  `lectureCaptureRecorderName` VARCHAR(255) NULL COMMENT 'Lecture capture recorder name',
-			  `longitude` float(11,6) DEFAULT NULL COMMENT 'Map longitude',
-			  `latitude` float(10,6) DEFAULT NULL COMMENT 'Map latitude',
 			  `universityMapUrl` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'University Map link',
 			  `suppressedFromListingsByDefault` tinyint DEFAULT NULL COMMENT 'Suppress from listings?',
 			  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Automatic timestamp',
