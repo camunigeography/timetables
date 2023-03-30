@@ -210,7 +210,7 @@ class timetables extends frontControllerApplication
 			  `active` enum('','Yes','No') NOT NULL DEFAULT 'Yes' COMMENT 'Currently active?',
 			  `privilege` enum('Administrator','Restricted administrator') NOT NULL DEFAULT 'Administrator' COMMENT 'Administrator level',
 			  PRIMARY KEY (`username__JOIN__people__people__reserved`)
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8mb4_unicode_ci COMMENT='System administrators';
+			) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='System administrators';
 			
 			-- Area of activity
 			CREATE TABLE `areaOfActivity` (
@@ -227,7 +227,7 @@ class timetables extends frontControllerApplication
 			  `hideFromNew` tinyint DEFAULT NULL COMMENT 'Whether to hide this for new event creation',
 			  PRIMARY KEY (`id`),
 			  UNIQUE KEY `moniker` (`moniker`)
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8mb4_unicode_ci COMMENT='Area of activity';
+			) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Area of activity';
 			
 			-- Bookings
 			CREATE TABLE `bookings` (
@@ -252,7 +252,7 @@ class timetables extends frontControllerApplication
 			  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Automatic timestamp (created at)',
 			  PRIMARY KEY (`id`),
 			  KEY `date` (`date`)
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8mb4_unicode_ci COMMENT='Bookings';
+			) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Bookings';
 			
 			-- Buildings
 			CREATE TABLE `buildings` (
@@ -263,7 +263,7 @@ class timetables extends frontControllerApplication
 			  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Automatic timestamp',
 			  PRIMARY KEY (`id`),
 			  UNIQUE KEY `moniker` (`moniker`)
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8mb4_unicode_ci COMMENT='Buildings';
+			) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Buildings';
 			
 			-- Editors
 			CREATE TABLE `editors` (
@@ -273,7 +273,7 @@ class timetables extends frontControllerApplication
 			  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Automatic timestamp',
 			  PRIMARY KEY (`id`),
 			  UNIQUE KEY `userId` (`userid`)
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8mb4_unicode_ci COMMENT='Editors';
+			) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Editors';
 			
 			-- Event types
 			CREATE TABLE `eventTypes` (
@@ -281,7 +281,7 @@ class timetables extends frontControllerApplication
 			  `name` varchar(255) NOT NULL COMMENT 'Description of event type',
 			  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 			  PRIMARY KEY (`id`)
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8mb4_unicode_ci COMMENT='Event types';
+			) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Event types';
 			
 			-- People
 			CREATE TABLE `people` (
@@ -291,7 +291,7 @@ class timetables extends frontControllerApplication
 			  `surname` varchar(255) DEFAULT NULL COMMENT 'Surname',
 			  `name` varchar(255) DEFAULT NULL COMMENT 'Name (automatically generated)',
 			  PRIMARY KEY (`id`)
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8mb4_unicode_ci COMMENT='People';
+			) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='People';
 			
 			-- Rooms
 			CREATE TABLE `rooms` (
@@ -307,13 +307,13 @@ class timetables extends frontControllerApplication
 			  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Automatic timestamp',
 			  PRIMARY KEY (`id`),
 			  UNIQUE KEY `moniker` (`moniker`)
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8mb4_unicode_ci COMMENT='Rooms';
+			) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Rooms';
 			
 			-- Seeded dates (populated below)
 			CREATE TABLE `seededDates` (
 			  `date` date NOT NULL,
 			  PRIMARY KEY (`date`)
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8mb4_unicode_ci COMMENT='Seeded dates';
+			) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Seeded dates';
 			
 			-- Settings
 			CREATE TABLE `settings` (
@@ -350,7 +350,7 @@ class timetables extends frontControllerApplication
 			  `lectureCaptureEndMinutes` INT NOT NULL DEFAULT '5' COMMENT 'Lecture capture - exclude minutes at end',
 			  `lectureCaptureTitlePrefix` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Lecture capture title prefix',
 			  PRIMARY KEY (`id`)
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8mb4_unicode_ci COMMENT='Settings';
+			) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Settings';
 			
 			-- Special dates, e.g. bank holidays
 			CREATE TABLE `specialDates` (
@@ -361,7 +361,7 @@ class timetables extends frontControllerApplication
 			  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Automatic timestamp',
 			  PRIMARY KEY (`id`),
 			  UNIQUE KEY `date` (`date`)
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8mb4_unicode_ci COMMENT='Special dates, e.g. bank holidays';
+			) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Special dates, e.g. bank holidays';
 			
 			-- Term dates
 			CREATE TABLE `terms` (
@@ -374,7 +374,7 @@ class timetables extends frontControllerApplication
 			  `untilDate` date NOT NULL COMMENT 'The last day of term',
 			  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Automatic timestamp',
 			  PRIMARY KEY (`id`)
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8mb4_unicode_ci COMMENT='Term dates';
+			) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Term dates';
 			
 			-- User profiles
 			CREATE TABLE `users` (
@@ -384,7 +384,7 @@ class timetables extends frontControllerApplication
 			  `weeksAhead` int(2) NOT NULL COMMENT 'Weeks ahead default',
 			  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 			  PRIMARY KEY (`id`)
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8mb4_unicode_ci COMMENT='User profiles';
+			) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='User profiles';
 			
 			-- Populate the seeded dates table with dates from 1970 to 2038; see https://www.artfulsoftware.com/infotree/qrytip.php?id=95 and https://web.archive.org/web/20110309002522/creative-territory.net/post/view/id/31/
 			CREATE TABLE tempDigits (i INT NOT NULL PRIMARY KEY);
