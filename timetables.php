@@ -5198,6 +5198,18 @@ class timetables extends frontControllerApplication
 		$html .= "\n<br />";
 		$html .= "\n<p class=\"actions\"><a href=\"{$this->baseUrl}/lecturecapture.xml\">" . $this->icon ('control_end_blue') . 'Export Lecture Capture list file</a></p>';
 		
+		# Show list of recorders
+		$recorders = application::array_field_entries ($bookings, 'Classroom');
+		$html .= "\n" . '<h3>Recorders</h3>';
+		$html .= "\n<p>The data file contains the following " . count ($recorders) . ' recorders:</p>';
+		$html .= "\n" . application::htmlUl ($recorders, 0, 'small');
+		
+		# Show list of course folders
+		$courseFolders = application::array_field_entries ($bookings, 'CourseTitle');
+		$html .= "\n" . '<h3>Course folders</h3>';
+		$html .= "\n<p>The data file contains the following " . count ($courseFolders) . ' course folders:</p>';
+		$html .= "\n" . application::htmlUl ($courseFolders, 0, 'small');
+		
 		# Show table equivalent
 		$html .= "\n" . '<h3>Entries</h3>';
 		$total = count ($bookings);
