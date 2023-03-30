@@ -206,22 +206,22 @@ class timetables extends frontControllerApplication
 			
 			-- System administrators
 			CREATE TABLE `administrators` (
-			  `username__JOIN__people__people__reserved` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Username',
-			  `active` enum('','Yes','No') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Yes' COMMENT 'Currently active?',
-			  `privilege` enum('Administrator','Restricted administrator') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Administrator' COMMENT 'Administrator level',
+			  `username__JOIN__people__people__reserved` varchar(191) NOT NULL COMMENT 'Username',
+			  `active` enum('','Yes','No') NOT NULL DEFAULT 'Yes' COMMENT 'Currently active?',
+			  `privilege` enum('Administrator','Restricted administrator') NOT NULL DEFAULT 'Administrator' COMMENT 'Administrator level',
 			  PRIMARY KEY (`username__JOIN__people__people__reserved`)
 			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8mb4_unicode_ci COMMENT='System administrators';
 			
 			-- Area of activity
 			CREATE TABLE `areaOfActivity` (
 			  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Automatic key',
-			  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Description',
+			  `name` varchar(255) NOT NULL COMMENT 'Description',
 			  `parentId` int(11) NOT NULL COMMENT 'Parent area of activity',
-			  `shortname` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Optional short name',
-			  `moniker` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Timetable page web address (must be unique)',
+			  `shortname` varchar(255) DEFAULT NULL COMMENT 'Optional short name',
+			  `moniker` varchar(40) NOT NULL COMMENT 'Timetable page web address (must be unique)',
 			  `createdOn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Automatic timestamp',
-			  `people` text COLLATE utf8mb4_unicode_ci COMMENT 'People always associated with this activity (usernames, one per line)',
-			  `website` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Website',
+			  `people` text COMMENT 'People always associated with this activity (usernames, one per line)',
+			  `website` varchar(255) DEFAULT NULL COMMENT 'Website',
 			  `lectureCaptureFolder` VARCHAR(255) NULL COMMENT 'Lecture capture folder',
 			  `highlighted` TINYINT NULL COMMENT 'Highlight in list?',
 			  `hideFromNew` tinyint DEFAULT NULL COMMENT 'Whether to hide this for new event creation',
@@ -232,23 +232,23 @@ class timetables extends frontControllerApplication
 			-- Bookings
 			CREATE TABLE `bookings` (
 			  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Booking no.',
-			  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Event title',
+			  `name` varchar(255) NOT NULL COMMENT 'Event title',
 			  `areaOfActivityId` int(11) NOT NULL COMMENT 'Applies to everyone in',
 			  `eventTypeId` int(11) NOT NULL COMMENT 'Event type',
-			  `bookedForUserid` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Who the booking is for',
+			  `bookedForUserid` varchar(255) NOT NULL COMMENT 'Who the booking is for',
 			  `roomId` int(11) NOT NULL COMMENT 'Room / location',
 			  `date` date NOT NULL COMMENT 'Date',
 			  `startTime` time NOT NULL COMMENT 'Start time',
 			  `untilTime` time NOT NULL COMMENT 'Finishing time (until)',
-			  `series` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Series ID',
-			  `url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Web link, if any',
+			  `series` varchar(255) DEFAULT NULL COMMENT 'Series ID',
+			  `url` varchar(255) DEFAULT NULL COMMENT 'Web link, if any',
 			  `lectureCapture` ENUM('','Explicitly disable') NULL COMMENT 'Lecture capture',
-			  `notes` text COLLATE utf8mb4_unicode_ci COMMENT 'Miscellaneous notes',
+			  `notes` text COMMENT 'Miscellaneous notes',
 			  `draft` tinyint DEFAULT NULL COMMENT 'Draft booking (hidden for now)?',
-			  `requestedBy` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Requested booking by',
+			  `requestedBy` varchar(255) DEFAULT NULL COMMENT 'Requested booking by',
 			  `hideFromDisplayBoard` tinyint DEFAULT NULL COMMENT 'Hide from display board listing?',
-			  `bookedByUserid` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Person making the booking',
-			  `updatedByUserid` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Person updating the booking',
+			  `bookedByUserid` varchar(255) NOT NULL COMMENT 'Person making the booking',
+			  `updatedByUserid` varchar(255) DEFAULT NULL COMMENT 'Person updating the booking',
 			  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Automatic timestamp (created at)',
 			  PRIMARY KEY (`id`),
 			  KEY `date` (`date`)
@@ -257,8 +257,8 @@ class timetables extends frontControllerApplication
 			-- Buildings
 			CREATE TABLE `buildings` (
 			  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Automatic key',
-			  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Name of the building',
-			  `moniker` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Timetable page web address (must be unique)',
+			  `name` varchar(255) NOT NULL COMMENT 'Name of the building',
+			  `moniker` varchar(40) NOT NULL COMMENT 'Timetable page web address (must be unique)',
 			  `isInternal` tinyint DEFAULT NULL COMMENT 'Is this building internal?',
 			  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Automatic timestamp',
 			  PRIMARY KEY (`id`),
@@ -268,7 +268,7 @@ class timetables extends frontControllerApplication
 			-- Editors
 			CREATE TABLE `editors` (
 			  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Automatic key',
-			  `userid` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'User ID',
+			  `userid` varchar(191) NOT NULL COMMENT 'User ID',
 			  `reviewer` tinyint DEFAULT NULL COMMENT 'Reviewer?',
 			  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Automatic timestamp',
 			  PRIMARY KEY (`id`),
@@ -278,31 +278,31 @@ class timetables extends frontControllerApplication
 			-- Event types
 			CREATE TABLE `eventTypes` (
 			  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Automatic key',
-			  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Description of event type',
+			  `name` varchar(255) NOT NULL COMMENT 'Description of event type',
 			  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 			  PRIMARY KEY (`id`)
 			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8mb4_unicode_ci COMMENT='Event types';
 			
 			-- People
 			CREATE TABLE `people` (
-			  `id` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Username',
-			  `title` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Title',
-			  `forename` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Forename',
-			  `surname` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Surname',
-			  `name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Name (automatically generated)',
+			  `id` varchar(50) NOT NULL COMMENT 'Username',
+			  `title` varchar(255) DEFAULT NULL COMMENT 'Title',
+			  `forename` varchar(255) DEFAULT NULL COMMENT 'Forename',
+			  `surname` varchar(255) DEFAULT NULL COMMENT 'Surname',
+			  `name` varchar(255) DEFAULT NULL COMMENT 'Name (automatically generated)',
 			  PRIMARY KEY (`id`)
 			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8mb4_unicode_ci COMMENT='People';
 			
 			-- Rooms
 			CREATE TABLE `rooms` (
 			  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Automatic key',
-			  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Name of room',
+			  `name` varchar(255) NOT NULL COMMENT 'Name of room',
 			  `buildingId` int(11) DEFAULT NULL COMMENT 'Building',
-			  `moniker` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Timetable page web address (must be unique)',
-			  `note` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Note to other Editors',
+			  `moniker` varchar(40) NOT NULL COMMENT 'Timetable page web address (must be unique)',
+			  `note` varchar(255) DEFAULT NULL COMMENT 'Note to other Editors',
 			  `ignoreClashes` TINYINT NULL DEFAULT NULL COMMENT 'Ignore clashes in clash-checking?',
 			  `lectureCaptureRecorderName` VARCHAR(255) NULL COMMENT 'Lecture capture recorder name',
-			  `universityMapUrl` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'University Map link',
+			  `universityMapUrl` varchar(255) DEFAULT NULL COMMENT 'University Map link',
 			  `suppressedFromListingsByDefault` tinyint DEFAULT NULL COMMENT 'Suppress from listings?',
 			  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Automatic timestamp',
 			  PRIMARY KEY (`id`),
@@ -325,14 +325,14 @@ class timetables extends frontControllerApplication
 			  `minimumWeeks` int(2) NOT NULL DEFAULT '4' COMMENT 'Minimum weeks to show in certain views',
 			  `maximumWeeks` int(2) NOT NULL DEFAULT '8' COMMENT 'Maximum weeks to show in certain views',
 			  `startingDayCustomWeek` int(1) DEFAULT NULL COMMENT 'The starting day of a custom week',
-			  `anyUsernameAccess` enum('Yes','No') COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Whether access is available to anyone with a username (rather than just those in a list of people)',
+			  `anyUsernameAccess` enum('Yes','No') NOT NULL COMMENT 'Whether access is available to anyone with a username (rather than just those in a list of people)',
 			  `startingMonthCustomYear` int(2) NOT NULL COMMENT 'Starting month number of custom year (e.g. 10 = October)',
-			  `customYearLabel` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Label for custom year (or blank to disable)',
+			  `customYearLabel` varchar(255) DEFAULT NULL COMMENT 'Label for custom year (or blank to disable)',
 			  `flaggedEventsNumber` int(11) NOT NULL COMMENT 'Number of events in the Flagged events list',
-			  `termLabels` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Term labels',
+			  `termLabels` varchar(255) NOT NULL COMMENT 'Term labels',
 			  `weeksInTerm` int(2) DEFAULT NULL COMMENT 'The number of weeks in a term',
 			  `weeksInTermFirstNumber` int(1) DEFAULT NULL COMMENT 'The numbering of the first week in term (e.g. 1 or 0)',
-			  `termDatesUrl` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Web link URL showing term dates reference',
+			  `termDatesUrl` varchar(255) DEFAULT NULL COMMENT 'Web link URL showing term dates reference',
 			  `skipPreviousDays` tinyint DEFAULT NULL COMMENT 'Whether to enable skipping of past days in the table views',
 			  `yearsAheadBookable` int(2) NOT NULL COMMENT 'How many years ahead are bookable',
 			  `yearsBehindBookable` int(2) DEFAULT NULL COMMENT 'How many years behind are bookable',
@@ -356,8 +356,8 @@ class timetables extends frontControllerApplication
 			CREATE TABLE `specialDates` (
 			  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Automatic key',
 			  `date` date NOT NULL COMMENT 'Date',
-			  `type` enum('','Bank holiday','Closure','Other') COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Type',
-			  `description` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Description',
+			  `type` enum('','Bank holiday','Closure','Other') NOT NULL COMMENT 'Type',
+			  `description` varchar(255) NOT NULL COMMENT 'Description',
 			  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Automatic timestamp',
 			  PRIMARY KEY (`id`),
 			  UNIQUE KEY `date` (`date`)
@@ -366,10 +366,10 @@ class timetables extends frontControllerApplication
 			-- Term dates
 			CREATE TABLE `terms` (
 			  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Automatic key',
-			  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Name',
+			  `name` varchar(255) NOT NULL COMMENT 'Name',
 			  `startYear` year(4) NOT NULL COMMENT 'Start year in year range',
 			  `endYear` year(4) NOT NULL COMMENT 'End year in year range',
-			  `termLabel` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Term label',
+			  `termLabel` varchar(255) NOT NULL COMMENT 'Term label',
 			  `startDate` date NOT NULL COMMENT 'The date the term starts on',
 			  `untilDate` date NOT NULL COMMENT 'The last day of term',
 			  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Automatic timestamp',
@@ -378,7 +378,7 @@ class timetables extends frontControllerApplication
 			
 			-- User profiles
 			CREATE TABLE `users` (
-			  `id` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Username',
+			  `id` varchar(191) NOT NULL COMMENT 'Username',
 			  `startDate` date DEFAULT NULL COMMENT 'Start date for main listing',
 			  `untilDate` date DEFAULT NULL COMMENT 'Until date for main listing',
 			  `weeksAhead` int(2) NOT NULL COMMENT 'Weeks ahead default',
