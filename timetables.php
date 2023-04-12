@@ -2226,19 +2226,8 @@ class timetables extends frontControllerApplication
 				if ($marginTop > $marginTopRow) {$marginTopRow = $marginTop;}
 			}
 			
-			# Create an HTML list of each booking
-			$list = array ();
-			foreach ($bookings as $id => $booking) {
-				$contents = $this->bookingCellText ($booking);
-				$tooltip = $this->bookingCellText ($booking, true);
-				$classes = array ();
-				if ($highlightBookings && in_array ($id, $highlightBookings)) {$classes[] = 'highlighted';}
-				if ($this->userIsEditor && $booking['draft']) {$classes[] = 'draft';}
-				$style = ($format == 'grid' ? " style=\"margin-left: -{$booking['margin-left']}%; width: {$booking['width']}%;" . ($booking['margin-right'] ? " margin-right: {$booking['margin-right']};" : '') . ($booking['margin-top'] ? " margin-top: {$booking['margin-top']}px;" : '') . '"' : '');
-				$list[$id]  = '<li' . $style . ($classes ? ' class="' . (implode (' ', $classes)) . '"' : '') . ">\n\t\t\t\t<div title=\"{$tooltip}\">{$contents}\n\t\t\t\t</div>\n\t\t\t</li>";
-				$startTimePreviousBooking = $booking['startTime'];
-			}
-			$listHtml = '<ul class="bookings">' . "\n\t\t\t" . implode ("\n\t\t\t", $list) . "\n\t\t" . '</ul>';
+			# Compile the bookings list for the day, which will be visually overlaid
+			$listHtml = $this->bookingsListForDay ($bookings, $highlightBookings, $format);
 			
 			# Determine if this is today
 			$isToday = ($dateIso == $todayIso);
@@ -2257,7 +2246,7 @@ class timetables extends frontControllerApplication
 			}
 			$dateAsTime = strtotime ($dateIso);
 			$html .= "\n\t\t" . "<h4><div><a href=\"{$dayLink}\" title=\"" . date ('l, jS F', $dateAsTime) . '">' . nl2br (date (($format == 'grid' ? "l\njS F" : 'l, jS F'), $dateAsTime)) . '</a>' . ($isSpecialDate ? '<br /><br /><span>' . htmlspecialchars ($isSpecialDate) . '</span>' : '') . ($customWeekIndicator ? '<br /><br /><span class="customweekindicator">' . $customWeekIndicator . '</span>' : '') . '</div></h4>';
-			$html .= "\n\t\t" . $listHtml;
+			$html .= $listHtml;
 			$html .= "\n\t" . '</div>';
 		}
 		
@@ -2297,6 +2286,63 @@ class timetables extends frontControllerApplication
 		$html .= "\n\t\t" . '</ul>';
 		
 		# Return the row HTML
+		return $html;
+	}
+	
+	
+	# Function to compile the bookings list for a day
+	private function bookingsListForDay ($bookings, $highlightBookings, $format)
+	{
+		# Create an HTML list of each booking
+		$list = array ();
+		foreach ($bookings as $id => $booking) {
+			
+			# Get main contents and tooltip version
+			$contents = $this->bookingCellText ($booking);
+			$tooltip = $this->bookingCellText ($booking, true);
+			
+			# Determine classes
+			$classes = array ();
+			if ($highlightBookings && in_array ($id, $highlightBookings)) {
+				$classes[] = 'highlighted';
+			}
+			if ($this->userIsEditor && $booking['draft']) {
+				$classes[] = 'draft';
+			}
+			$classesHtml = '';
+			if ($classes) {
+				$classesHtml = ' class="' . implode (' ', $classes) . '"';
+			}
+			
+			# Determine styles (margins/width)
+			$styleHtml = '';
+			if ($format == 'grid') {
+				$styles = array ();
+				$styles[] = "margin-left: -{$booking['margin-left']}%;";
+				$styles[] = "width: {$booking['width']}%;";
+				if ($booking['margin-right']) {
+					$styles[] = "margin-right: {$booking['margin-right']};";
+				}
+				if ($booking['margin-top']) {
+					$styles[] = "margin-top: {$booking['margin-top']}px;";
+				}
+				$styleHtml = ' style="' . implode (' ', $styles) . '"';
+			}
+			
+			# Register the list entry
+			$list[$id]  = '<li' . $styleHtml . $classesHtml . '>';
+			$list[$id] .= "\n\t\t\t\t" . '<div title="' . $tooltip . '">';
+			$list[$id] .= $contents;
+			$list[$id] .= "\n\t\t\t\t</div>";
+			$list[$id] .= "\n\t\t\t</li>";
+		}
+		
+		# Compile to list
+		$html  = "\n\t\t" . '<ul class="bookings">';
+		$html .= "\n\t\t\t" . implode ("\n\t\t\t", $list);
+		$html .= "\n\t\t" . '</ul>';
+		
+		# Return the bookings HTML
 		return $html;
 	}
 	
