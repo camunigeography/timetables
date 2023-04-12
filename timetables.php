@@ -2139,23 +2139,8 @@ class timetables extends frontControllerApplication
 		$titleSpace = 0.1;	// i.e. 10%
 		$availableWidth = $fullWidth - $titleSpace;
 		
-		# If there are linkable parameters, compile as a query string element
-		$linkableParameters = ($linkableParameters ? '&amp;' . http_build_query ($linkableParameters) : '');
-		
-		# Compile the background timeslot grid, with only the date parameter to be filled in afterwards
-		$totalTimeslots = $this->settings['workingDayUntilHour'] - $this->settings['workingDayStartHour'];
-		$widthFractionPerTimeslot = ($availableWidth / $totalTimeslots);
-		$widthPercentagePerTimeslot = ($widthFractionPerTimeslot * 100);
-		$timeslots = array ();
-		for ($hour = $this->settings['workingDayStartHour']; $hour < $this->settings['workingDayUntilHour']; $hour++) {
-			$hoursLeft = $this->settings['workingDayUntilHour'] - $hour;
-			$marginLeftPercentage = (($widthFractionPerTimeslot * $hoursLeft) * 100);
-			$hourFormatted = date ('ga', mktime ($hour, 1, 1, 7, 26, 2012));	// Date is arbitrary - all we want is an hour like (int) 8 to become a formatted string like '8am'
-			$untilHour = ($hour == 24 ? 0 : $hour) + $this->settings['defaultBookingLengthHours'];
-			$link = ($this->userIsEditor ? " <a href=\"{$this->baseUrl}/bookings/add.html?date=%hour&amp;startTime=" . str_pad ($hour, 2, '0', STR_PAD_LEFT) . ":00:00&amp;untilTime=" . str_pad ($untilHour, 2, '0', STR_PAD_LEFT) . ":00:00{$linkableParameters}\" title=\"Create booking here\">+</a>" : '');
-			$timeslots[$hour] = sprintf ('<li style="margin-left: -%s%%; width: %s%%;"><div>%s%s</div></li>', $marginLeftPercentage, $widthPercentagePerTimeslot, $hourFormatted, $link);
-		}
-		$timeslotsGrid = "\n\t\t" . '<ul class="timeslots">' . "\n\t\t\t" . implode ("\n\t\t\t", $timeslots) . "\n\t\t" . '</ul>';
+		# Get the background timescale row grid, with only the date parameter to be filled in afterwards
+		$backgroundTimeslotRowHtml = $this->backgroundTimeslotRow ($availableWidth, $linkableParameters);
 		
 		# Get the special dates
 		$specialDates = $this->getSpecialDates ();
@@ -2268,7 +2253,7 @@ class timetables extends frontControllerApplication
 			$columnHeightStyle = ($marginTopRow ? ' style="height: ' . ($this->settings['dayHeightPx'] + $marginTopRow) . 'px;"' : '');	// If the height is not the default, extend it, taking account of the IE marging bug also
 			$html .= "\n\n\t" . '<div class="day' . ($isPast ? ' past' : '') . ($isToday ? ' today' : '') . ($isSpecialDate ? ' specialdate' : '') . '"' . ($format == 'grid' ? $columnHeightStyle : '') . '>';
 			if ($format == 'grid') {
-				$html .= str_replace ('date=%hour', 'date=' . $dateIso, $timeslotsGrid);
+				$html .= str_replace ('date=%hour', 'date=' . $dateIso, $backgroundTimeslotRowHtml);
 			}
 			$dateAsTime = strtotime ($dateIso);
 			$html .= "\n\t\t" . "<h4><div><a href=\"{$dayLink}\" title=\"" . date ('l, jS F', $dateAsTime) . '">' . nl2br (date (($format == 'grid' ? "l\njS F" : 'l, jS F'), $dateAsTime)) . '</a>' . ($isSpecialDate ? '<br /><br /><span>' . htmlspecialchars ($isSpecialDate) . '</span>' : '') . ($customWeekIndicator ? '<br /><br /><span class="customweekindicator">' . $customWeekIndicator . '</span>' : '') . '</div></h4>';
@@ -2280,6 +2265,38 @@ class timetables extends frontControllerApplication
 		$html .= "\n\t" . '</div>';
 		
 		# Return the HTML
+		return $html;
+	}
+	
+	
+	# Function to compile the background timescale grid, with only the date parameter to be filled in afterwards
+	private function backgroundTimeslotRow ($availableWidth, $linkableParameters)
+	{
+		# If there are linkable parameters, compile as a query string element
+		$linkableParameters = ($linkableParameters ? '&amp;' . http_build_query ($linkableParameters) : '');
+		
+		# Calculate width percentage
+		$totalTimeslots = $this->settings['workingDayUntilHour'] - $this->settings['workingDayStartHour'];
+		$widthFractionPerTimeslot = ($availableWidth / $totalTimeslots);
+		$widthPercentagePerTimeslot = ($widthFractionPerTimeslot * 100);
+		
+		# Create each of the timeslots for a row
+		$timeslots = array ();
+		for ($hour = $this->settings['workingDayStartHour']; $hour < $this->settings['workingDayUntilHour']; $hour++) {
+			$hoursLeft = $this->settings['workingDayUntilHour'] - $hour;
+			$marginLeftPercentage = (($widthFractionPerTimeslot * $hoursLeft) * 100);
+			$hourFormatted = date ('ga', mktime ($hour, 1, 1, 7, 26, 2012));	// Date is arbitrary - all we want is an hour like (int) 8 to become a formatted string like '8am'
+			$untilHour = ($hour == 24 ? 0 : $hour) + $this->settings['defaultBookingLengthHours'];
+			$link = ($this->userIsEditor ? " <a href=\"{$this->baseUrl}/bookings/add.html?date=%hour&amp;startTime=" . str_pad ($hour, 2, '0', STR_PAD_LEFT) . ":00:00&amp;untilTime=" . str_pad ($untilHour, 2, '0', STR_PAD_LEFT) . ":00:00{$linkableParameters}\" title=\"Create booking here\">+</a>" : '');
+			$timeslots[$hour] = sprintf ('<li style="margin-left: -%s%%; width: %s%%;"><div>%s%s</div></li>', $marginLeftPercentage, $widthPercentagePerTimeslot, $hourFormatted, $link);
+		}
+		
+		# Compile to list
+		$html  = "\n\t\t" . '<ul class="timeslots">';
+		$html .= "\n\t\t\t" . implode ("\n\t\t\t", $timeslots);
+		$html .= "\n\t\t" . '</ul>';
+		
+		# Return the row HTML
 		return $html;
 	}
 	
