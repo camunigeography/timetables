@@ -2125,14 +2125,6 @@ class timetables extends frontControllerApplication
 	# Function to create an HTML grid of days
 	private function weekGrid ($startOfWeekIso, $bookingsByDay, $linkableParameters, $highlightBookings, $format, $customWeekStartDates)
 	{
-		# Start the HTML
-		$html = '';
-		
-		# Start with the heading
-		$html .= $this->weekHeading ($startOfWeekIso);
-		
-		# Start a week
-		$html .= "\n\t" . '<div class="week">';
 		
 		# Define the available width for each row that excludes the title
 		$fullWidth = 1;		// i.e. 100%
@@ -2151,6 +2143,7 @@ class timetables extends frontControllerApplication
 		# Loop through each day
 		$css = array ();
 		$dayNumber = 0;
+		$daysHtml = array ();
 		foreach ($bookingsByDay as $dateIso => $bookings) {
 			
 			# Skip if a previous day if required
@@ -2170,9 +2163,9 @@ class timetables extends frontControllerApplication
 			$dayTrimmed = (int) $day;
 			$dayLink = $this->baseUrl . "/{$year}/{$this->months[$monthTrimmed]}/{$dayTrimmed}/";
 			
-			# Determine 8am and 6pm
-			$workingDayStart = $midnightAtDayStart + ($this->settings['workingDayStartHour']  * 60*60);
-			$workingDayEnd = $midnightAtDayStart + ($this->settings['workingDayUntilHour'] * 60*60);
+			# Determine start/end/length of day
+			$workingDayStart = $midnightAtDayStart + ($this->settings['workingDayStartHour'] * 60*60);
+			$workingDayEnd   = $midnightAtDayStart + ($this->settings['workingDayUntilHour'] * 60*60);
 			$lengthOfDay = $workingDayEnd - $workingDayStart;
 			
 			# Calculate the positioning for each booking
@@ -2223,7 +2216,9 @@ class timetables extends frontControllerApplication
 				}
 				
 				# Save the largest margin top
-				if ($marginTop > $marginTopRow) {$marginTopRow = $marginTop;}
+				if ($marginTop > $marginTopRow) {
+					$marginTopRow = $marginTop;
+				}
 			}
 			
 			# Compile the bookings list for the day, which will be visually overlaid
@@ -2238,19 +2233,22 @@ class timetables extends frontControllerApplication
 			# Determine if this day is the start of a custom week
 			$customWeekIndicator = (isSet ($customWeekStartDates[$dateIso]) ? 'Start of ' . str_replace ('(', '<br />(', htmlspecialchars ($customWeekStartDates[$dateIso])) : false);
 			
-			# Add this day to the week chart
+			# Compile the HTML for this day, for the week chart
 			$columnHeightStyle = ($marginTopRow ? ' style="height: ' . ($this->settings['dayHeightPx'] + $marginTopRow) . 'px;"' : '');	// If the height is not the default, extend it, taking account of the IE marging bug also
-			$html .= "\n\n\t" . '<div class="day' . ($isPast ? ' past' : '') . ($isToday ? ' today' : '') . ($isSpecialDate ? ' specialdate' : '') . '"' . ($format == 'grid' ? $columnHeightStyle : '') . '>';
+			$daysHtml[$dateIso]  = "\n\n\t" . '<div class="day' . ($isPast ? ' past' : '') . ($isToday ? ' today' : '') . ($isSpecialDate ? ' specialdate' : '') . '"' . ($format == 'grid' ? $columnHeightStyle : '') . '>';
 			if ($format == 'grid') {
-				$html .= str_replace ('date=%hour', 'date=' . $dateIso, $backgroundTimeslotRowHtml);
+				$daysHtml[$dateIso] .= str_replace ('date=%hour', 'date=' . $dateIso, $backgroundTimeslotRowHtml);
 			}
 			$dateAsTime = strtotime ($dateIso);
-			$html .= "\n\t\t" . "<h4><div><a href=\"{$dayLink}\" title=\"" . date ('l, jS F', $dateAsTime) . '">' . nl2br (date (($format == 'grid' ? "l\njS F" : 'l, jS F'), $dateAsTime)) . '</a>' . ($isSpecialDate ? '<br /><br /><span>' . htmlspecialchars ($isSpecialDate) . '</span>' : '') . ($customWeekIndicator ? '<br /><br /><span class="customweekindicator">' . $customWeekIndicator . '</span>' : '') . '</div></h4>';
-			$html .= $listHtml;
-			$html .= "\n\t" . '</div>';
+			$daysHtml[$dateIso] .= "\n\t\t" . "<h4><div><a href=\"{$dayLink}\" title=\"" . date ('l, jS F', $dateAsTime) . '">' . nl2br (date (($format == 'grid' ? "l\njS F" : 'l, jS F'), $dateAsTime)) . '</a>' . ($isSpecialDate ? '<br /><br /><span>' . htmlspecialchars ($isSpecialDate) . '</span>' : '') . ($customWeekIndicator ? '<br /><br /><span class="customweekindicator">' . $customWeekIndicator . '</span>' : '') . '</div></h4>';
+			$daysHtml[$dateIso] .= $listHtml;
+			$daysHtml[$dateIso] .= "\n\t" . '</div>';
 		}
 		
-		# End the week
+		# Compile the HTML
+		$html  = $this->weekHeading ($startOfWeekIso);
+		$html .= "\n\t" . '<div class="week">';
+		$html .= implode ($daysHtml);
 		$html .= "\n\t" . '</div>';
 		
 		# Return the HTML
