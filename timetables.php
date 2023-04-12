@@ -1726,19 +1726,19 @@ class timetables extends frontControllerApplication
 		$html = '';
 		
 		# Strip out non-date-related WHERE clauses
-		$where = $this->whereFilteringDateOnly ($where);
+		$whereDates = $this->whereFilteringDateOnly ($where);
 		
 		# Load required libraries
 		require_once ('timedate.php');
 		
 		# Arrange the bookings by week and day
-		$bookingsByWeekThenDay = $this->arrangeBookingsByWeekThenDay ($bookings, $where);
+		$bookingsByWeekThenDay = $this->arrangeBookingsByWeekThenDay ($bookings, $whereDates);
 		
 		# Determine today
 		$todayIso = date ('Y-m-d');
 		
 		# If in day mode, show that
-		$dayMode = (isSet ($where['date_day']));		// #!# Perhaps slightly brittle - needs further consideration
+		$dayMode = (isSet ($whereDates['date_day']));		// #!# Perhaps slightly brittle - needs further consideration
 		if ($dayMode) {
 			#!# Need to state which day
 			$title = 'Bookings for day';
@@ -1753,7 +1753,7 @@ class timetables extends frontControllerApplication
 		
 		# Determine if we are viewing custom week(s) that need edge chopping
 		#!# Review this as it isn't being used
-		// $customWeekEdgeChopping = $this->customWeekEdgeChopping ($where);
+		// $customWeekEdgeChopping = $this->customWeekEdgeChopping ($whereDates);
 		
 		# Show a date-setting panel; NB this must come immediately before the first H3 as otherwise the CSS adjacent sibling (+) selector won't match it
 		$html .= $this->dateRangePanel ();
@@ -2013,10 +2013,10 @@ class timetables extends frontControllerApplication
 	
 	
 	# Function to arrange the bookings by week then day
-	private function arrangeBookingsByWeekThenDay ($bookings, $where)
+	private function arrangeBookingsByWeekThenDay ($bookings, $whereDates)
 	{
 		# Get the dates of each week based on the bookings
-		$datesOfWeeks = $this->datesOfWeeks ($bookings, $where);
+		$datesOfWeeks = $this->datesOfWeeks ($bookings, $whereDates);
 		
 		# Regroup the bookings by startDate
 		$bookingsByDate = application::regroup ($bookings, 'startDate', false);
@@ -2037,7 +2037,7 @@ class timetables extends frontControllerApplication
 			}
 		}
 		
-		//application::dumpData ($where);
+		//application::dumpData ($whereDates);
 		//application::dumpData ($bookings);
 		//application::dumpData ($datesOfWeeks);
 		//application::dumpData ($bookingsByDate);
@@ -2049,10 +2049,10 @@ class timetables extends frontControllerApplication
 	
 	
 	# Function to get the dates of weeks for the range of bookings supplied
-	private function datesOfWeeks ($bookings, $where)
+	private function datesOfWeeks ($bookings, $whereDates)
 	{
 		# Do a first pass to get the outer dates
-		$whereSql = implode (' AND ', $where);
+		$whereSql = implode (' AND ', $whereDates);
 		$query = "
 			SELECT
 				UNIX_TIMESTAMP(MIN(`date`)) AS earliestBookingTime,
@@ -2125,7 +2125,6 @@ class timetables extends frontControllerApplication
 	# Function to create an HTML grid of days
 	private function weekGrid ($startOfWeekIso, $bookingsByDay, $linkableParameters, $highlightBookings, $format, $customWeekStartDates)
 	{
-		
 		# Define the available width for each row that excludes the title
 		$fullWidth = 1;		// i.e. 100%
 		$titleSpace = 0.1;	// i.e. 10%
