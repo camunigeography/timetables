@@ -58,16 +58,16 @@
 		RewriteRule ^$baseUrl/(bookings)/(draft|alldrafts).html $baseUrl/index.html?action=$1&do=$2 [L,QSA]
 		RewriteRule ^$baseUrl/(bookings)/(request).html $baseUrl/index.html?action=$1&do=$2 [L,QSA]
 	# Generic CRUD operations on most data structure types, though main objects have the timetable listing for the List view
-		RewriteRule ^$baseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|activities|people|rooms)/$ $baseUrl/index.html?action=$1&do=list [L,QSA]
+		RewriteRule ^$baseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|roomunavailability|activities|people|rooms)/$ $baseUrl/index.html?action=$1&do=list [L,QSA]
 		RewriteRule ^$baseUrl/(bookings)/\1.(csv)$ $baseUrl/index.html?action=$1&do=list&exportall=$2 [L,QSA]
-		RewriteRule ^$baseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|activities|people|rooms)$ $baseUrl/$1/ [R]
+		RewriteRule ^$baseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|roomunavailability|activities|people|rooms)$ $baseUrl/$1/ [R]
 		RewriteRule ^$baseUrl/(people)/all.html$ $baseUrl/index.html?action=$1&do=list&mode=all [L,QSA]
-		RewriteRule ^$baseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|activities|people|rooms)/(add|search)\.html$ $baseUrl/index.html?action=$1&do=$2 [L,QSA]
+		RewriteRule ^$baseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|roomunavailability|activities|people|rooms)/(add|search)\.html$ $baseUrl/index.html?action=$1&do=$2 [L,QSA]
 		#!# Not clear this exportall is actually in use
-		RewriteRule ^$baseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|activities|people|rooms)/(search)\.(csv)$ $baseUrl/index.html?action=$1&do=$2exportall=$3 [L,QSA]
-		RewriteRule ^$baseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|activities|people|rooms)/([^/]+)/(|timetable.ics|export.html|timetable.csv)$ $baseUrl/index.html?action=$1&id=$2&do=view&export=$3 [L,QSA]
-		RewriteRule ^$baseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|activities|people|rooms)/([^/]+)$ $baseUrl/$1/$2/ [R]
-		RewriteRule ^$baseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|activities|people|rooms)/([^/]+)/(delete|edit|clone).html$ $baseUrl/index.html?action=$1&id=$2&do=$3 [L,QSA]
+		RewriteRule ^$baseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|roomunavailability|activities|people|rooms)/(search)\.(csv)$ $baseUrl/index.html?action=$1&do=$2exportall=$3 [L,QSA]
+		RewriteRule ^$baseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|roomunavailability|activities|people|rooms)/([^/]+)/(|timetable.ics|export.html|timetable.csv)$ $baseUrl/index.html?action=$1&id=$2&do=view&export=$3 [L,QSA]
+		RewriteRule ^$baseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|roomunavailability|activities|people|rooms)/([^/]+)$ $baseUrl/$1/$2/ [R]
+		RewriteRule ^$baseUrl/(bookings|eventtypes|editors|buildings|terms|specialdates|roomunavailability|activities|people|rooms)/([^/]+)/(delete|edit|clone).html$ $baseUrl/index.html?action=$1&id=$2&do=$3 [L,QSA]
 		RewriteRule ^$baseUrl/(bookings)/([-,0-9]*[0-9])/$ $baseUrl/index.html?action=$1&id=$2&do=view [L,QSA]
 		RewriteRule ^$baseUrl/(bookings)/([-,0-9]*[0-9])$ $baseUrl/$1/$2/ [R]
 	# People view

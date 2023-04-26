@@ -147,6 +147,15 @@ class timetables extends frontControllerApplication
 				'privilege' => 'userIsEditor',
 				'table' => 'specialDates',
 			),
+			'roomunavailability' => array (
+				'description' => 'Room unavailability',
+				'url' => 'roomunavailability/',
+				'parent' => 'more',
+				'subtab' => 'Room unavailability',
+				'icon' => 'door_out',
+				'privilege' => 'userIsEditor',
+				'table' => 'roomUnavailability',
+			),
 			'today' => array (
 				'description' => 'Lobby screen page',
 				'url' => 'today/',
@@ -308,6 +317,16 @@ class timetables extends frontControllerApplication
 			  PRIMARY KEY (`id`),
 			  UNIQUE KEY `moniker` (`moniker`)
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Rooms';
+			
+			-- Room unavailability
+			CREATE TABLE `roomUnavailability` (
+			  `id` INT(11) NOT NULL AUTO_INCREMENT COMMENT 'Automatic key',
+			  `roomId` INT(11) NOT NULL COMMENT 'Room',
+			  `startDate` DATE NOT NULL COMMENT 'Start date',
+			  `endDate` DATE NOT NULL COMMENT 'Finish date',
+			  `publicNote` varchar(255) DEFAULT NULL COMMENT 'Note (public)',
+			  PRIMARY KEY (`id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT = 'Room unavailability';
 			
 			-- Seeded dates (populated below)
 			CREATE TABLE `seededDates` (
@@ -1851,6 +1870,28 @@ class timetables extends frontControllerApplication
 	}
 	
 	
+	# Function to get room unavailability between dates
+	private function getRoomUnavailability ($indexField = 'roomId' /* or moniker */)
+	{
+		# Get the room unavailabilities
+		$query = "
+			SELECT
+				{$indexField} AS id,
+				startDate,
+				endDate
+			FROM {$this->settings['database']}.roomUnavailability
+			LEFT JOIN {$this->settings['database']}.rooms ON roomId = rooms.id
+		;";
+		$data = $this->databaseConnection->getData ($query);
+		
+		# Group by room
+		$data = application::regroup ($data, 'id');
+		
+		# Return the data
+		return $data;
+	}
+	
+	
 	# Exporting page
 	private function exportingPage ()
 	{
@@ -2877,6 +2918,13 @@ class timetables extends frontControllerApplication
 	
 	# Special dates
 	public function specialdates ()
+	{
+		echo $this->crudEditing ();
+	}
+	
+	
+	# Room unavailability
+	public function roomunavailability ()
 	{
 		echo $this->crudEditing ();
 	}
@@ -4184,6 +4232,19 @@ class timetables extends frontControllerApplication
 					if (!$unfinalisedDataWithClashOverrideCheckbox['overrideClash']) {
 						foreach ($bookingClashes as $index => $errorMessage) {
 							$form->registerProblem ('bookingClash' . ($index + 1), $errorMessage . ' You can override clash checking below.');
+						}
+					}
+				}
+				
+				# Check room unavailability
+				if ($unfinalisedData['roomId'] && $unfinalisedData['date']) {
+					$roomUnavailabilityByRoom = $this->getRoomUnavailability ('roomId');
+					if (isSet ($roomUnavailabilityByRoom[$unfinalisedData['roomId']])) {
+						foreach ($roomUnavailabilityByRoom[$unfinalisedData['roomId']] as $dateRange) {
+							if (($unfinalisedData['date'] >= $dateRange['startDate']) && ($unfinalisedData['date'] <= $dateRange['endDate'])) {
+								$form->registerProblem ('getRoomUnavailability', "That room is not available to be booked between {$dateRange['startDate']} and {$dateRange['endDate']}.");
+								break;	// No point checking further date ranges
+							}
 						}
 					}
 				}
