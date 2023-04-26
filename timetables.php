@@ -3307,7 +3307,7 @@ class timetables extends frontControllerApplication
 		}
 		
 		# Introduce the listing
-		$html .= "\n<p>Here are all the {$description}" . ($this->action == 'bookings' ? ', newest first' : '') . ':</p>';
+		$html .= "\n<p>Here are all the {$description} entries" . ($this->action == 'bookings' ? ', newest first' : '') . ':</p>';
 		
 		# If the data is hierarchical, show a hierarchical display instead of a table listing
 		#!# This code seems to be unused - need to check on its status
