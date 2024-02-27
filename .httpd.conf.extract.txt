@@ -90,11 +90,6 @@
 		php_value memory_limit 250M
 	</LocationMatch>
 	
-	<Location /robots.txt>
-		Satisfy Any
-		Allow from all
-	</Location>
-	
 	# Screen display
 	<Location $baseUrl/today>
 		php_value auto_prepend_file none
