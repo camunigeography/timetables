@@ -79,8 +79,7 @@
 	
 	# Disable all kinds of access restriction on export files (as calendars cannot do Raven authentication)
 	<LocationMatch "\.ics$">
-		Satisfy Any
-		Allow from all
+		Require all granted
 	</LocationMatch>
 	<LocationMatch "\.(ics|csv|xml)$">
 		php_value auto_prepend_file none
