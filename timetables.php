@@ -2,7 +2,7 @@
 
 
 # Class to create an online timetable system
-require_once ('frontControllerApplication.php');
+require_once ('vendor/autoload.php');
 class timetables extends frontControllerApplication
 {
 	# Function to assign defaults additional to the general application defaults
@@ -529,7 +529,6 @@ class timetables extends frontControllerApplication
 		
 		# Convert the panels to an expandable listing
 		#!# Need to add state memory to this
-		require_once ('jquery.php');
 		$jQuery = new jQuery (/* $this->databaseConnection, "{$this->baseUrl}/data.html", $_SERVER['REMOTE_USER'] */ false, false, false, true);
 		$jQuery->expandable ($panels /*, $expandState, $saveState */);
 		$html .= $jQuery->getHtml ();
@@ -1747,9 +1746,6 @@ class timetables extends frontControllerApplication
 		# Strip out non-date-related WHERE clauses
 		$whereDates = $this->whereFilteringDateOnly ($where);
 		
-		# Load required libraries
-		require_once ('timedate.php');
-		
 		# Arrange the bookings by week and day
 		$bookingsByWeekThenDay = $this->arrangeBookingsByWeekThenDay ($bookings, $whereDates);
 		
@@ -1849,7 +1845,6 @@ class timetables extends frontControllerApplication
 		}
 		
 		# Load into tabs
-		require_once ('jquery.php');
 		$jQuery = new jQuery (false, false, false, true);
 		$jQuery->tabs ($labels, $panes, 0, false, false, $tabsClass = 'tabsflat');
 		$html .= $jQuery->getHtml ();
@@ -1896,7 +1891,6 @@ class timetables extends frontControllerApplication
 	private function exportingPage ()
 	{
 		# Box within the tab
-		require_once ('ical.php');
 		$ical = new ical ();
 		$icsFile = dirname ($_SERVER['SCRIPT_URL'] . 'bogus') . '/timetable.ics';	// 'bogus' ensures that e.g. /timetables/ gives /timetables/ rather than /
 		$extraInstructions  = "\n" . '<p>The timetable system includes an iCal feed link in the top-right of each page.</p>';
@@ -1962,7 +1956,6 @@ class timetables extends frontControllerApplication
 		}
 		
 		# Delegate to iCal class
-		require_once ('ical.php');
 		$ical = new ical ();
 		$title = ($title ? $title . ' - ' : '') . $this->settings['calendarName'];
 		$icalString = $ical->create ($events, $title, 'ac.uk.cam.geog', 'Timetable');
@@ -2012,7 +2005,6 @@ class timetables extends frontControllerApplication
 		}
 		
 		# Convert the bookings to CSV
-		require_once ('csv.php');
 		$csv = csv::dataToCsv ($bookings);
 		
 		# Set the filename base
@@ -3323,7 +3315,6 @@ class timetables extends frontControllerApplication
 		if ($paginate) {
 			$html .= "\n<p>There " . ($totalAvailable == 1 ? 'is <strong>one</strong> booking.' : 'are <strong>' . number_format ($totalAvailable) . "</strong> bookings.");
 			$html .= ($totalPages == 1 ? '' : " Showing {$this->settings['paginationRecordsPerPage']} records per page.") . '</p>';
-			require_once ('pagination.php');
 			$html .= pagination::paginationLinks ($page, $totalPages, $this->baseUrl . "/{$this->action}/", false, 'paginationlinks', true);
 		}
 		
@@ -3339,7 +3330,6 @@ class timetables extends frontControllerApplication
 	private function simplifyTimes ($data)
 	{
 		# Convert each field
-		require_once ('timedate.php');
 		foreach ($data as $index => $record) {
 			foreach ($record as $field => $value) {
 				if (preg_match ('/time$/i', $field)) {
@@ -3389,7 +3379,6 @@ class timetables extends frontControllerApplication
 			$data = $this->addAdditionalBookingsExportFields ($data);
 			ob_end_clean ();
 			ob_start ();
-			require_once ('csv.php');
 			csv::serve ($data, $table, true, $headings);
 			ob_end_flush ();
 			exit;
@@ -3666,7 +3655,6 @@ class timetables extends frontControllerApplication
 		);
 		
 		# Load and run the multisearch facility
-		require_once ('multisearch.php');
 		$multisearch = new multisearch ($settings);
 		$html = $multisearch->getHtml ();
 		
@@ -4624,7 +4612,6 @@ class timetables extends frontControllerApplication
 		if (!$id) {
 			
 			# Add support for managing a hierarchical structure
-			require_once ('hierarchy.php');
 			$this->hierarchy = new hierarchy ($data);
 			
 			# Define the activities list values
