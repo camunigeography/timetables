@@ -3,16 +3,11 @@
 # Load using:
 #	# Timetables system
 #	Include /path/to/timetables/.httpd.conf.extract.txt
-#	Use MacroTemplateApplication /path/to/timetables "/path/to/site/:/path/to/timetables/:/path/to/php/libraries/"
+#	Use MacroTemplateApplication /timetables
 
 
 # Timetables
-<Macro MacroTimetables $baseUrl $includePath>
-	
-	# Include path
-	<Location $baseUrl>
-		php_value include_path "$includePath"
-	</Location>
+<Macro MacroTimetables $baseUrl>
 	
 	# Front controller application support
 	Use MacroFrontControllerApplication "$baseUrl/" "Timetables"
