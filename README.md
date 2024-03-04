@@ -32,7 +32,7 @@ Dependencies
 Author
 ------
 
-Martin Lucas-Smith, Department of Geography, University of Cambridge, 2012-2024.
+Martin Lucas-Smith, Department of Geography, University of Cambridge, 2012-24.
 
 
 License
