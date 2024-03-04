@@ -2,7 +2,6 @@
 
 
 # Class to create an online timetable system
-require_once ('vendor/autoload.php');
 class timetables extends frontControllerApplication
 {
 	# Function to assign defaults additional to the general application defaults

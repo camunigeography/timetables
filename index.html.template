@@ -8,7 +8,7 @@ $settings = array (
 );
 
 # Run the application with the specified settings
-require_once ('timetables/timetables.php');
+require_once ('vendor/autoload.php');
 new timetables ($settings);
 
 ?>
