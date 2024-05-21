@@ -810,7 +810,11 @@ class timetables extends frontControllerApplication
 				return $html;
 			}
 			$where = $this->whereFilteringNoDate ($where);
-			$where['date_implicit_from'] = "`date` >= '" . date ('Y-m-d') . "'";
+			if ($this->export == 'ics') {
+				$where['date_implicit_from'] = "`date` >= DATE_SUB('" . date ('Y-m-d') . "', INTERVAL 3 YEAR)";
+			} else {
+				$where['date_implicit_from'] = "`date` >= '" . date ('Y-m-d') . "'";
+			}
 			$bookings = $this->getBookings ($where);
 			$title = end ($breadcrumbEntries);
 			$this->exportBookings ($bookings, $this->export, $title);
