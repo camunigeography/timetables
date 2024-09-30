@@ -163,6 +163,13 @@ class timetables extends frontControllerApplication
 				'icon' => 'picture_empty',
 				'export' => true,
 			),
+			'teachingloads' => array (
+				'description' => 'Teaching loads data',
+				'url' => 'teachingloads.html',
+				'parent' => 'more',
+				'subtab' => 'Teaching loads data',
+				'icon' => 'table_multiple',
+			),
 			'maintenance' => array (
 				'description' => 'Data maintenance',
 				'url' => 'maintenance.html',
@@ -3003,6 +3010,93 @@ class timetables extends frontControllerApplication
 		
 		# Show the HTML
 		echo $html;
+	}
+	
+	
+	# Function to create a table for teaching loads
+	public function teachingloads ()
+	{
+		# Define the query; this uses CTE
+		$query = "
+		WITH RECURSIVE
+			
+			-- IDs of areas of activity under the undergraduate tree
+			undergraduateAreasOfActivity AS (
+				SELECT areaOfActivity.id, areaOfActivity.moniker, areaOfActivity.parentId, 0 AS depth
+					FROM timetables.areaOfActivity
+					WHERE moniker = 'undergraduate' /* container of interest */
+				UNION All
+				SELECT a2.id, a2.moniker, a2.parentId, depth + 1
+					FROM areaOfActivity a2
+					JOIN undergraduateAreasOfActivity ON a2.parentId = undergraduateAreasOfActivity.id
+			),
+			
+			-- Ditto, for postgraduate areas of activity
+			postgraduateAreasOfActivity AS (
+				SELECT areaOfActivity.id, areaOfActivity.moniker, areaOfActivity.parentId, 0 AS depth
+					FROM areaOfActivity
+					WHERE moniker = 'postgraduate' /* container of interest */
+				UNION All
+				SELECT a2.id, a2.moniker, a2.parentId, depth + 1
+					FROM areaOfActivity a2
+					JOIN postgraduateAreasOfActivity ON a2.parentId = postgraduateAreasOfActivity.id
+			),
+			
+			-- Sessions, with multi-user entries split out
+			sessions AS (
+				SELECT * FROM (
+					-- Get time by user + event type
+					SELECT
+						bookings.id,
+						REPLACE(TRIM('|' FROM TRIM(bookedForUserid)), '|', ',') AS users,
+						IF(bookings.areaOfActivityId IN(SELECT id FROM undergraduateAreasOfActivity), 'Undergraduate', 'Postgraduate') AS cohort,
+						eventTypes.name AS eventType,
+						TIMESTAMPDIFF(MINUTE,
+							CONCAT(`date`, ' ', startTime),
+							CONCAT(`date`, ' ', untilTime)
+							) AS minutes
+					FROM bookings
+					JOIN eventTypes ON bookings.eventTypeId = eventTypes.id
+					WHERE
+						`date` >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+						AND (
+							bookings.areaOfActivityId IN(SELECT id FROM undergraduateAreasOfActivity)
+							OR bookings.areaOfActivityId IN(SELECT id FROM postgraduateAreasOfActivity)
+						)
+					ORDER BY id
+				) AS sessionsJoined
+				UNION ALL
+					SELECT
+						id,
+						REGEXP_REPLACE(users, '^[^,]*,', '') AS users,
+						cohort,
+						eventType,
+						minutes
+					FROM sessions
+					WHERE users LIKE '%,%'
+			)
+			
+			-- Get the teaching loads
+			SELECT username, forename, surname, cohort, eventType, totalHours
+			FROM (
+				SELECT
+					REGEXP_REPLACE(users, ',.*', '') AS username,
+					cohort,
+					eventType,
+					(TRIM((SUM(minutes) / 60)) + 0) AS totalHours
+				FROM sessions
+				GROUP BY username, cohort, eventType
+			) AS teachingLoads
+			LEFT JOIN people.people USING (username)
+			ORDER BY ISNULL(surname) /* move unmatched null names to end */, surname, forename, IF(cohort = 'Undergraduate', 0, 1), eventType
+			;
+			";
+			
+			# Get the data
+			$data = $this->databaseConnection->getData ($query);
+			$html = application::htmlTable ($data, array (), 'lines compressed', $keyAsFirstColumn = false);
+			
+			echo $html;
 	}
 	
 	

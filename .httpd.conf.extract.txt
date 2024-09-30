@@ -70,7 +70,7 @@
 		RewriteRule ^$baseUrl/(lecturecapture)\.html$ $baseUrl/index.html?action=$1 [L,QSA]
 		RewriteRule ^$baseUrl/(lecturecapture)\.xml$ $baseUrl/index.html?action=$1xml [L,QSA]
 	# Other pages
-		RewriteRule ^$baseUrl/(more|maintenance|clone)\.html$ $baseUrl/index.html?action=$1 [L,QSA]
+		RewriteRule ^$baseUrl/(more|maintenance|clone|teachingloads)\.html$ $baseUrl/index.html?action=$1 [L,QSA]
 	
 	# Disable all kinds of access restriction on export files (as calendars cannot do Raven authentication)
 	<LocationMatch "\.ics$">
