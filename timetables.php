@@ -3169,8 +3169,23 @@ class timetables extends frontControllerApplication
 				}
 			}
 			
+			# Add Javascript copy HTML function
+			$html .= "\n" . '<p><a href="#" id="copytoclipboard">Copy to clipboard<span id="copytoclipboardtick"></span></a></p>';
+			$html .= "\n" . "<script>
+				document.getElementById ('copytoclipboard').addEventListener ('click', function (e) {
+					const field = document.querySelector ('#datatable');
+					const range = document.createRange ();
+					range.selectNode (field);
+					window.getSelection ().addRange (range);
+					document.execCommand ('copy');
+					range.collapse ();
+					document.getElementById ('copytoclipboardtick').textContent = (' ✓');
+					e.preventDefault ();
+				});
+			</script>";
+			
 			# Render to an HTML table
-			$html .= application::htmlTable ($table, array (), 'border compressed small', $keyAsFirstColumn = false, false, array ('title'), false, false, false, array (), false, $showHeadings = false);
+			$html .= application::htmlTable ($table, array (), 'border compressed small" id="datatable', $keyAsFirstColumn = false, false, array ('title'), false, false, false, array (), false, $showHeadings = false);
 			
 			# Show the HTML
 			echo $html;
