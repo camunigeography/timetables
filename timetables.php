@@ -3016,6 +3016,21 @@ class timetables extends frontControllerApplication
 	# Function to create a table for teaching loads
 	public function teachingloads ()
 	{
+		# Create a custom year control, and retrieve the selected start date
+		$startDate = $this->customYearControl ($customYearControlHtml /* returned by reference */);
+		
+		# Start the HTML
+		$html  = "\n<p>This table shows a live dataset on teaching loads, listed by user. Users are listed in order of staff type.</p>";
+		$html .= "\n<p>Notes:</p>";
+		$html .= "\n<ul>
+					<li>If a person appears twice with a different username, you should <a href=\"{$this->baseUrl}/people/consolidate/\" target=\"_blank\">consolidate their entries</a>, then refresh this page.</li>
+					<li>If you notice other anomalies in the counts, you can <a href=\"{$this->baseUrl}/bookings/search.html\" target=\"_blank\">edit any relevant bookings</a> (using the advanced search tab) and then refresh this page.</li>
+					<li>Users without a forename/surname/type are not currently in the main contacts database so should be added there, then their entries consolidated to the new username.</li>
+					<li>Staff types reflect their <strong>current</strong> assignment in the contacts database.</li>
+				</ul>";
+		$html .= "\n<br />";
+		$html .= $customYearControlHtml;
+		
 		# Define the query; this uses CTE
 		$query = "
 		WITH RECURSIVE
@@ -3058,7 +3073,8 @@ class timetables extends frontControllerApplication
 					FROM bookings
 					JOIN eventTypes ON bookings.eventTypeId = eventTypes.id
 					WHERE
-						`date` >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+						    `date` >= '{$startDate}'
+						AND `date` < DATE_ADD('{$startDate}', INTERVAL 1 YEAR)
 						AND (
 							bookings.areaOfActivityId IN(SELECT id FROM undergraduateAreasOfActivity)
 							OR bookings.areaOfActivityId IN(SELECT id FROM postgraduateAreasOfActivity)
@@ -3100,7 +3116,13 @@ class timetables extends frontControllerApplication
 			
 			# Get the data
 			$entries = $this->databaseConnection->getData ($query);
-			//application::dumpData ($entries);
+			
+			# End if no entries
+			if (!$entries) {
+				$html .= "\n<p><em>There are no matching entries for the selected " . htmlspecialchars ($this->settings['customYearLabel']) . '.</em></p>';
+				echo $html;
+				return;
+			}
 			
 			# Obtain all the users in the data, to enable a consistent set of row columns to be created; this will avoid duplicates and retain the order
 			$users = array ();
@@ -3148,14 +3170,53 @@ class timetables extends frontControllerApplication
 			}
 			
 			# Render to an HTML table
-			$html  = "\n<p>This table shows a live dataset on teaching loads, listed by user. Users are listed in order of staff type.</p>";
-			$html .= "\n<p>Notes:</p>";
-			$html .= "\n<ul><li>If a person appears twice with a different username, you should <a href=\"{$this->baseUrl}/people/consolidate/\" target=\"_blank\">consolidate their entries</a>, then refresh this page.</li><li>If you notice other anomalies in the counts, you can <a href=\"{$this->baseUrl}/bookings/search.html\" target=\"_blank\">edit any relevant bookings</a> (using the advanced search tab) and then refresh this page.</li><li>Users without a forename/surname/type are not currently in the main contacts database so should be added there, then their entries consolidated to the new username.</li></ul>";
-			$html .= "\n<br />";
 			$html .= application::htmlTable ($table, array (), 'border compressed small', $keyAsFirstColumn = false, false, array ('title'), false, false, false, array (), false, $showHeadings = false);
 			
 			# Show the HTML
 			echo $html;
+	}
+	
+	
+	# Function to create an custom year control
+	private function customYearControl (&$html)
+	{
+		# Get the earliest booking in the database
+		$earliestDate = $this->databaseConnection->selectOneField ($this->settings['database'], 'bookings', 'date', array (), array (), false, '`date` ASC', $limit = 1);
+		list ($year, $month, $day) = explode ('-', $earliestDate);
+		
+		# Determine the earliest full custom year; e.g. if custom month is 9, then 2015-07-15 would be 2014-2015
+		$customYearStart = ($month < $this->settings['startingMonthCustomYear'] ? $year - 1 : $year);
+		
+		# Determine the current custom year
+		$currentCustomYearStart = (date ('m') < $this->settings['startingMonthCustomYear'] ? date ('Y') - 1 : date ('Y'));
+		
+		# Compile dropdown choices
+		$yearRanges = array ();
+		for ($yearStart = $customYearStart; $yearStart <= $currentCustomYearStart; $yearStart++) {
+			$yearRanges[] = $yearStart . ($this->settings['startingMonthCustomYear'] != 1 ? '-' . ($yearStart + 1) : '');		// If month is 1, don't show YYYY-YYYY, only YYYY
+		}
+		rsort ($yearRanges);		// Earliest first
+		
+		# Determine default
+		$selectedYearRange = (isSet ($_GET['year']) && in_array ($_GET['year'], $yearRanges) ? $_GET['year'] : application::array_first_value ($yearRanges));
+		list ($selectedYearStart, $selectedYearEnd) = explode ('-', $selectedYearRange);
+		
+		# Create as form
+		$html  = "\n\n<form>";
+		$html .= "\n<p>" . ucfirst (htmlspecialchars ($this->settings['customYearLabel'])) . " (starting month {$this->settings['startingMonthCustomYear']}):";
+		$html .= "\n<select name=\"year\" onchange=\"this.form.submit ();\">";
+		foreach ($yearRanges as $yearRange) {
+			$html .= "\n\t<option" . ($yearRange == $selectedYearRange ? ' selected="selected"' : '') . '>' . $yearRange . '</option>';
+		}
+		$html .= '<select>';
+		$html .= "\n</p>";
+		$html .= "\n</form>";
+		
+		# Determine the selected custom year's start date
+		$dateStart = $selectedYearStart . '-' . str_pad ($this->settings['startingMonthCustomYear'], 2, '0', STR_PAD_LEFT) . '-01';
+		
+		# Return the start date for the selected custom year; the HTML will be returned by reference
+		return $dateStart;
 	}
 	
 	
