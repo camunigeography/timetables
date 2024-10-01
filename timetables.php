@@ -3077,7 +3077,7 @@ class timetables extends frontControllerApplication
 			)
 			
 			-- Get the teaching loads
-			SELECT username, forename, surname, cohort, eventType, totalHours
+			SELECT username, forename, surname, staffType.staffType, cohort, eventType, totalHours
 			FROM (
 				SELECT
 					REGEXP_REPLACE(users, ',.*', '') AS username,
@@ -3088,14 +3088,73 @@ class timetables extends frontControllerApplication
 				GROUP BY username, cohort, eventType
 			) AS teachingLoads
 			LEFT JOIN people.people USING (username)
-			ORDER BY ISNULL(surname) /* move unmatched null names to end */, surname, forename, IF(cohort = 'Undergraduate', 0, 1), eventType
+			LEFT JOIN people.staffType ON people.staffType__JOIN__people__staffType__reserved = people.staffType.id
+			ORDER BY
+				ISNULL(staffType), staffType,
+				ISNULL(surname) /* move unmatched null names to end */, surname,
+				forename,
+				IF(cohort = 'Undergraduate', 0, 1),
+				eventType
 			;
 			";
 			
 			# Get the data
-			$data = $this->databaseConnection->getData ($query);
-			$html = application::htmlTable ($data, array (), 'lines compressed', $keyAsFirstColumn = false);
+			$entries = $this->databaseConnection->getData ($query);
+			//application::dumpData ($entries);
 			
+			# Obtain all the users in the data, to enable a consistent set of row columns to be created; this will avoid duplicates and retain the order
+			$users = array ();
+			foreach ($entries as $entry) {
+				$users[$entry['username']] = application::arrayFields ($entry, array ('username', 'forename', 'surname', 'staffType'));
+			}
+			
+			# Regroup by cohort and then event type, then index by username
+			$data = array ();
+			foreach ($entries as $entry) {
+				$data[$entry['cohort']][$entry['eventType']][$entry['username']] = $entry['totalHours'];
+			}
+			
+			# Start a table for presentation
+			$table = array ();
+			
+			# Initialise the titles; NB the row indexes are not for display but ensure uniqueness given that event types appear multiple times
+			$table['Username']['title'] = '<strong>Username</strong>';
+			$table['Forename']['title'] = '<strong>Forename</strong>';
+			$table['Surname']['title'] = '<strong>Surname</strong>';
+			$table['Staff type']['title'] = '<strong>Staff type</strong>';
+			foreach ($data as $cohort => $dataByCohort) {
+				$table[$cohort]['title'] = '<strong>' . htmlspecialchars ($cohort) . '</strong>';
+				foreach ($dataByCohort as $eventType => $entries) {
+					$table["{$cohort}: {$eventType}"]['title'] = $eventType;
+				}
+			}
+			
+			# Add data for each user along the row
+			foreach ($users as $username => $user) {
+				
+				# Names along the table
+				$table['Username'][] = $username;
+				$table['Forename'][] = $user['forename'];
+				$table['Surname'][]  = $user['surname'];
+				$table['Staff type'][]  = $user['staffType'];
+				
+				# Undergraduate
+				foreach ($data as $cohort => $dataByCohort) {
+					$table[$cohort][$username] = '';		// Heading row
+					foreach ($dataByCohort as $eventType => $entries) {
+						$table["{$cohort}: {$eventType}"][$username] = (isSet ($entries[$username]) ? $entries[$username] : '');
+					}
+				}
+			}
+			
+			# Render to an HTML table
+			$html  = "\n<p>This table shows a live dataset on teaching loads, listed by user. Users are listed in order of staff type.</p>";
+			$html .= "\n<p>Notes:</p>";
+			$html .= "\n<ul><li>If a person appears twice with a different username, you should <a href=\"{$this->baseUrl}/people/consolidate/\" target=\"_blank\">consolidate their entries</a>, then refresh this page.</li><li>If you notice other anomalies in the counts, you can <a href=\"{$this->baseUrl}/bookings/search.html\" target=\"_blank\">edit any relevant bookings</a> (using the advanced search tab) and then refresh this page.</li><li>Users without a forename/surname/type are not currently in the main contacts database so should be added there, then their entries consolidated to the new username.</li></ul>";
+			$html .= "\n<br />";
+			$html .= application::htmlTable ($table, array (), 'border compressed small', $keyAsFirstColumn = false, false, array ('title'), false, false, false, array (), false, $showHeadings = false);
+			
+			# Show the HTML
 			echo $html;
 	}
 	
