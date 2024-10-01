@@ -3130,7 +3130,13 @@ class timetables extends frontControllerApplication
 				$users[$entry['username']] = application::arrayFields ($entry, array ('username', 'forename', 'surname', 'staffType'));
 			}
 			
-			# Regroup by cohort and then event type, then index by username
+			# Obtain totals for each user
+			$totals = array ();
+			foreach ($entries as $entry) {
+				$totals[$entry['username']] = (isSet ($totals[$entry['username']]) ? $totals[$entry['username']] : 0) + $entry['totalHours'];
+			}
+			
+			# Regroup dataset by cohort and then event type, then index by username
 			$data = array ();
 			foreach ($entries as $entry) {
 				$data[$entry['cohort']][$entry['eventType']][$entry['username']] = $entry['totalHours'];
@@ -3145,11 +3151,12 @@ class timetables extends frontControllerApplication
 			$table['Surname']['title'] = '<strong>Surname</strong>';
 			$table['Staff type']['title'] = '<strong>Staff type</strong>';
 			foreach ($data as $cohort => $dataByCohort) {
-				$table[$cohort]['title'] = '<strong>' . htmlspecialchars ($cohort) . '</strong>';
+				$table[$cohort]['title'] = '<strong>' . htmlspecialchars ($cohort) . ':</strong>';
 				foreach ($dataByCohort as $eventType => $entries) {
 					$table["{$cohort}: {$eventType}"]['title'] = $eventType;
 				}
 			}
+			$table['Total']['title'] = '<strong>Total</strong>';
 			
 			# Add data for each user along the row
 			foreach ($users as $username => $user) {
@@ -3160,13 +3167,16 @@ class timetables extends frontControllerApplication
 				$table['Surname'][]  = $user['surname'];
 				$table['Staff type'][]  = $user['staffType'];
 				
-				# Undergraduate
+				# Blocks for each cohort
 				foreach ($data as $cohort => $dataByCohort) {
 					$table[$cohort][$username] = '';		// Heading row
 					foreach ($dataByCohort as $eventType => $entries) {
 						$table["{$cohort}: {$eventType}"][$username] = (isSet ($entries[$username]) ? $entries[$username] : '');
 					}
 				}
+				
+				# Total
+				$table['Total'][] = $totals[$username];
 			}
 			
 			# Add Javascript copy HTML function
