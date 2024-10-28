@@ -4562,6 +4562,7 @@ class timetables extends frontControllerApplication
 	
 	
 	# Function to get additional results for bookings
+	#!# This is not technically compliant with timezone shifts, but in practice works OK because recurrent bookings are very rarely, if ever, put on Sundays and are determined from Monday early mornings; the algorithm should be reworked to determine the physical time, e.g. 12:30 and have that computed against the day, not merely incremented from Monday's timestamp
 	private function createSeries ($result)
 	{
 		# Obtain series parameters
