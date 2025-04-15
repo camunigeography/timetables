@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d4261d23695116ff8110df93bf30150e",
+    "content-hash": "c31035df5b717bf539322fa1a1d79c28",
     "packages": [
         {
             "name": "camunigeography/camunidata",
@@ -44,16 +44,16 @@
         },
         {
             "name": "libpurecontent/application",
-            "version": "v1.9.4",
+            "version": "v1.9.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/libpurecontent/application.git",
-                "reference": "25d07579f95a713c4abf88f8eb8029d2949dd9ec"
+                "reference": "2b36edb97a6541ddc0d987f7b660311e63e51878"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/libpurecontent/application/zipball/25d07579f95a713c4abf88f8eb8029d2949dd9ec",
-                "reference": "25d07579f95a713c4abf88f8eb8029d2949dd9ec",
+                "url": "https://api.github.com/repos/libpurecontent/application/zipball/2b36edb97a6541ddc0d987f7b660311e63e51878",
+                "reference": "2b36edb97a6541ddc0d987f7b660311e63e51878",
                 "shasum": ""
             },
             "require": {
@@ -78,9 +78,9 @@
             "description": "PHP library application within the pureContent library suite",
             "support": {
                 "issues": "https://github.com/libpurecontent/application/issues",
-                "source": "https://github.com/libpurecontent/application/tree/v1.9.4"
+                "source": "https://github.com/libpurecontent/application/tree/v1.9.7"
             },
-            "time": "2024-06-04T17:05:26+00:00"
+            "time": "2025-04-02T18:26:07+00:00"
         },
         {
             "name": "libpurecontent/csv",
@@ -206,16 +206,16 @@
         },
         {
             "name": "libpurecontent/frontcontrollerapplication",
-            "version": "v1.13.7",
+            "version": "v1.13.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/libpurecontent/frontcontrollerapplication.git",
-                "reference": "8abafe27f6f7c3e4baa8c56b3a57f4c578d99578"
+                "reference": "7d6a3b9ddeae68033be3485f5b62e2ee004fc592"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/libpurecontent/frontcontrollerapplication/zipball/8abafe27f6f7c3e4baa8c56b3a57f4c578d99578",
-                "reference": "8abafe27f6f7c3e4baa8c56b3a57f4c578d99578",
+                "url": "https://api.github.com/repos/libpurecontent/frontcontrollerapplication/zipball/7d6a3b9ddeae68033be3485f5b62e2ee004fc592",
+                "reference": "7d6a3b9ddeae68033be3485f5b62e2ee004fc592",
                 "shasum": ""
             },
             "require": {
@@ -226,7 +226,7 @@
                 "libpurecontent/sinenomine": "^1.1",
                 "libpurecontent/ultimateform": "^1.29",
                 "libpurecontent/useraccount": "^1.7",
-                "smarty/smarty": "^4.5"
+                "smarty/smarty": "^4.5.3"
             },
             "type": "library",
             "autoload": {
@@ -246,9 +246,9 @@
             "description": "PHP library frontControllerApplication within the pureContent library suite",
             "support": {
                 "issues": "https://github.com/libpurecontent/frontcontrollerapplication/issues",
-                "source": "https://github.com/libpurecontent/frontcontrollerapplication/tree/v1.13.7"
+                "source": "https://github.com/libpurecontent/frontcontrollerapplication/tree/v1.13.10"
             },
-            "time": "2024-06-04T17:07:39+00:00"
+            "time": "2025-03-05T16:51:54+00:00"
         },
         {
             "name": "libpurecontent/hierarchy",
@@ -291,16 +291,16 @@
         },
         {
             "name": "libpurecontent/ical",
-            "version": "v1.1.0",
+            "version": "v1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/libpurecontent/ical.git",
-                "reference": "ac0fcfab65139dc6dcba0cefc1fb3073eeb313ae"
+                "reference": "d46825e276c47af25217ff3b32607d32c38698ed"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/libpurecontent/ical/zipball/ac0fcfab65139dc6dcba0cefc1fb3073eeb313ae",
-                "reference": "ac0fcfab65139dc6dcba0cefc1fb3073eeb313ae",
+                "url": "https://api.github.com/repos/libpurecontent/ical/zipball/d46825e276c47af25217ff3b32607d32c38698ed",
+                "reference": "d46825e276c47af25217ff3b32607d32c38698ed",
                 "shasum": ""
             },
             "type": "library",
@@ -321,9 +321,9 @@
             "description": "PHP library ical within the pureContent library suite",
             "support": {
                 "issues": "https://github.com/libpurecontent/ical/issues",
-                "source": "https://github.com/libpurecontent/ical/tree/v1.1.0"
+                "source": "https://github.com/libpurecontent/ical/tree/v1.1.1"
             },
-            "time": "2024-01-15T17:06:02+00:00"
+            "time": "2025-04-15T14:41:54+00:00"
         },
         {
             "name": "libpurecontent/image",
@@ -532,16 +532,16 @@
         },
         {
             "name": "libpurecontent/timedate",
-            "version": "v1.3.1",
+            "version": "v1.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/libpurecontent/timedate.git",
-                "reference": "282ed1fdf024b5bae93cfb34896c331f0e43eb1a"
+                "reference": "a7da0b3ad68a5b8ce7556b3051cfcb7628b87535"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/libpurecontent/timedate/zipball/282ed1fdf024b5bae93cfb34896c331f0e43eb1a",
-                "reference": "282ed1fdf024b5bae93cfb34896c331f0e43eb1a",
+                "url": "https://api.github.com/repos/libpurecontent/timedate/zipball/a7da0b3ad68a5b8ce7556b3051cfcb7628b87535",
+                "reference": "a7da0b3ad68a5b8ce7556b3051cfcb7628b87535",
                 "shasum": ""
             },
             "type": "library",
@@ -562,26 +562,26 @@
             "description": "PHP library timedate within the pureContent library suite",
             "support": {
                 "issues": "https://github.com/libpurecontent/timedate/issues",
-                "source": "https://github.com/libpurecontent/timedate/tree/v1.3.1"
+                "source": "https://github.com/libpurecontent/timedate/tree/v1.4.1"
             },
-            "time": "2024-07-23T11:59:53+00:00"
+            "time": "2025-01-21T16:31:43+00:00"
         },
         {
             "name": "libpurecontent/ultimateform",
-            "version": "v1.29.7",
+            "version": "v1.31.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/libpurecontent/ultimateform.git",
-                "reference": "4b0513bd7199d46fcd9f1e1e4cd494a18183b88d"
+                "reference": "fcf73ecadcf1ec2c4dd51887ea1ad336f6d4cb7c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/libpurecontent/ultimateform/zipball/4b0513bd7199d46fcd9f1e1e4cd494a18183b88d",
-                "reference": "4b0513bd7199d46fcd9f1e1e4cd494a18183b88d",
+                "url": "https://api.github.com/repos/libpurecontent/ultimateform/zipball/fcf73ecadcf1ec2c4dd51887ea1ad336f6d4cb7c",
+                "reference": "fcf73ecadcf1ec2c4dd51887ea1ad336f6d4cb7c",
                 "shasum": ""
             },
             "require": {
-                "libpurecontent/application": "^1.9",
+                "libpurecontent/application": "^1.9.7",
                 "libpurecontent/database": "^4.2",
                 "libpurecontent/timedate": "^1.3"
             },
@@ -603,9 +603,9 @@
             "description": "PHP library ultimateForm within the pureContent library suite",
             "support": {
                 "issues": "https://github.com/libpurecontent/ultimateform/issues",
-                "source": "https://github.com/libpurecontent/ultimateform/tree/v1.29.7"
+                "source": "https://github.com/libpurecontent/ultimateform/tree/v1.31.1"
             },
-            "time": "2024-09-10T14:47:01+00:00"
+            "time": "2025-04-02T18:40:12+00:00"
         },
         {
             "name": "libpurecontent/useraccount",
