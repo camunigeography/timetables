@@ -609,8 +609,15 @@ class timetables extends frontControllerApplication
 	# Function get a database profile
 	private function getDatabaseProfile ()
 	{
+		# No profile if not logged in
+		if (!$this->user) {
+			return false;
+		}
+		
 		# End if none
-		if (!$data = $this->databaseConnection->selectOne ($this->settings['database'], 'users', array ('id' => $this->user), array ('startDate', 'weeksAhead', 'UNIX_TIMESTAMP(updatedAt) AS updatedAt'))) {return false;}
+		if (!$data = $this->databaseConnection->selectOne ($this->settings['database'], 'users', array ('id' => $this->user), array ('startDate', 'weeksAhead', 'UNIX_TIMESTAMP(updatedAt) AS updatedAt'))) {
+			return false;
+		}
 		
 		# Validate the profile
 		if (!$this->validProfile ($data)) {
