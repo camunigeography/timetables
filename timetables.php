@@ -1909,12 +1909,24 @@ class timetables extends frontControllerApplication
 	# Exporting page
 	private function exportingPage ()
 	{
+		# Require users to be logged in to get the iCal feed
+		if (!$this->user) {
+			return $html = "\n" . '<p class="warning">You must be logged in to create a calendar feed.</p>';
+		}
+		
 		# Box within the tab
 		$ical = new ical ();
-		$icsFile = dirname ($_SERVER['SCRIPT_URL'] . 'bogus') . '/timetable.ics';	// 'bogus' ensures that e.g. /timetables/ gives /timetables/ rather than /
+		$icsFile = dirname ($_SERVER['SCRIPT_URL'] . 'bogus') . '/timetable.ics' . "?token={$this->userProfile['token']}";	// 'bogus' ensures that e.g. /timetables/ gives /timetables/ rather than /
+		
+		# Construct the preamble
 		$extraInstructions  = "\n" . '<p>The timetable system includes an iCal feed link in the top-right of each page.</p>';
 		$extraInstructions .= "\n" . '<p>The iCal feeds will <strong>not have any date filtering</strong> applied, other than omitting previous days.</p>';
-		return $ical->instructionsLink ($icsFile, $extraInstructions);
+		
+		# Create the instructions panel
+		$html = $ical->instructionsLink ($icsFile, $extraInstructions);
+		
+		# Return the HTML
+		return $html;
 	}
 	
 	
