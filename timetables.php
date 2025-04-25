@@ -646,8 +646,8 @@ class timetables extends frontControllerApplication
 		$data = array ();
 		list ($data['startDate'], $data['weeksAhead'], $data['updatedAt']) = explode ($this->settings['daterangeCookieSeparator'], $_COOKIE[$this->settings['daterangeCookieName']]);
 		
-		# Validate the profile
-		if (!$this->validProfile ($data)) {
+		# Validate the cookie
+		if (!$this->validCookie ($data)) {
 			unset ($_COOKIE[$this->settings['daterangeCookieName']]);	// Delete the invalid cookie
 			return false;
 		}
@@ -657,8 +657,8 @@ class timetables extends frontControllerApplication
 	}
 	
 	
-	# Function to validate a profile
-	private function validProfile ($data)
+	# Function to validate cookie structure
+	private function validCookie ($data)
 	{
 		# Ensure the date is valid
 		if (!preg_match ('/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/', $data['startDate'], $matches)) {return false;}
