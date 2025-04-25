@@ -569,6 +569,7 @@ class timetables extends frontControllerApplication
 	
 	
 	# Function to get the user profile
+	#!# This is becoming rather unclear and should be tidied up, e.g. if user profile exists, read that then overwrite with cookie data if different
 	private function getUserProfile ()
 	{
 		# By default, use the default date state
@@ -579,7 +580,7 @@ class timetables extends frontControllerApplication
 			$data = $cookieProfile;
 		}
 		
-		# If there is a profile in the database, use that in preference
+		# If there is a profile in the database, use that in preference; a user profile will be created if a logged-in user is not yet present
 		if ($databaseProfile = $this->getDatabaseProfile ()) {
 			$data = $databaseProfile;
 		}
@@ -685,12 +686,11 @@ class timetables extends frontControllerApplication
 		
 		# If there is a user, add/update the view dates into their profile
 		if ($this->user) {
-			$profile = array (
-				'id' => $this->user,
+			$update = array (
 				'startDate' => $startDate,
 				'weeksAhead' => $weeksAhead,
 			);
-			$this->databaseConnection->insert ($this->settings['database'], 'users', $profile, $onDuplicateKeyUpdate = true);
+			$this->databaseConnection->update ($this->settings['database'], 'users', $update, array ('id' => $this->user));
 		}
 	}
 	
