@@ -614,15 +614,15 @@ class timetables extends frontControllerApplication
 			return false;
 		}
 		
-		# End if none
+		# If there is no profile, create it
 		if (!$data = $this->databaseConnection->selectOne ($this->settings['database'], 'users', array ('id' => $this->user), array ('startDate', 'weeksAhead', 'UNIX_TIMESTAMP(updatedAt) AS updatedAt'))) {
-			return false;
-		}
-		
-		# Validate the profile
-		if (!$this->validProfile ($data)) {
-			$this->databaseConnection->delete ($this->settings['database'], 'users', array ('id' => $this->user));	// Delete the invalid entry to keep the database clean
-			return false;
+			$profile = array (
+				'id' => $this->user,
+				'startDate' => $this->defaultDateState['startDate'],
+				'weeksAhead' => $this->defaultDateState['weeksAhead'],
+			);
+			if (!$this->databaseConnection->insert ($this->settings['database'], 'users', $profile)) {return false;}
+			return $this->getDatabaseProfile ();	// Second time will now return the profile
 		}
 		
 		# Return the data
