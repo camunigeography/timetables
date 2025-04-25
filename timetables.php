@@ -407,8 +407,10 @@ class timetables extends frontControllerApplication
 			  `startDate` date DEFAULT NULL COMMENT 'Start date for main listing',
 			  `untilDate` date DEFAULT NULL COMMENT 'Until date for main listing',
 			  `weeksAhead` int(2) NOT NULL COMMENT 'Weeks ahead default',
+			  `token` varchar(16) NOT NULL COMMENT 'Token for iCal',
 			  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-			  PRIMARY KEY (`id`)
+			  PRIMARY KEY (`id`),
+			  UNIQUE KEY (`token`)
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='User profiles';
 			
 			-- Populate the seeded dates table with dates from 1970 to 2038; see https://www.artfulsoftware.com/infotree/qrytip.php?id=95 and https://web.archive.org/web/20110309002522/creative-territory.net/post/view/id/31/
@@ -616,11 +618,12 @@ class timetables extends frontControllerApplication
 		}
 		
 		# If there is no profile, create it
-		if (!$data = $this->databaseConnection->selectOne ($this->settings['database'], 'users', array ('id' => $this->user), array ('startDate', 'weeksAhead', 'UNIX_TIMESTAMP(updatedAt) AS updatedAt'))) {
+		if (!$data = $this->databaseConnection->selectOne ($this->settings['database'], 'users', array ('id' => $this->user), array ('startDate', 'weeksAhead', 'token', 'UNIX_TIMESTAMP(updatedAt) AS updatedAt'))) {
 			$profile = array (
 				'id' => $this->user,
 				'startDate' => $this->defaultDateState['startDate'],
 				'weeksAhead' => $this->defaultDateState['weeksAhead'],
+				'token' => application::generatePassword (16),		// Assumed that collisions are unlikely given a length of 16
 			);
 			if (!$this->databaseConnection->insert ($this->settings['database'], 'users', $profile)) {return false;}
 			return $this->getDatabaseProfile ();	// Second time will now return the profile
