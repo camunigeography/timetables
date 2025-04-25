@@ -571,7 +571,6 @@ class timetables extends frontControllerApplication
 	
 	
 	# Function to get the user profile
-	#!# This is becoming rather unclear and should be tidied up, e.g. if user profile exists, read that then overwrite with cookie data if different
 	private function getUserProfile ()
 	{
 		# By default, use the default date state
@@ -590,8 +589,8 @@ class timetables extends frontControllerApplication
 		# However, if both a database and cookie profile are supplied, use the more recent (i.e. if database is more recent, undo the overwriting of the cookie profile), and copy (transfer) the cookie values into the database
 		if ($databaseProfile && $cookieProfile) {
 			if ($cookieProfile['updatedAt'] > $databaseProfile['updatedAt']) {
-				$data = $cookieProfile;
 				$this->saveImplicitViewDates ($data['startDate'], $data['weeksAhead']);
+				$data = $this->getDatabaseProfile ();	// Re-obtain the updated profile data
 			}
 		}
 		
