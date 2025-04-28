@@ -1577,6 +1577,16 @@ class timetables extends frontControllerApplication
 			return $html;
 		}
 		
+		# Add button for current person
+		if ($this->user) {
+			if ($this->action == 'people') {		// Show only on main listing
+				if (isSet ($data[$this->user])) {
+					$html .=  "\n<ul class=\"actions\"><li><a href=\"{$this->baseUrl}/people/{$this->user}/\"><img src=\"/images/icons/user.png\" alt=\"\" class=\"icon\" /> <strong>My listing</strong> &nbsp;({$this->user})</li></ul>";
+				}
+			}
+		}
+		
+		
 		# Compile the HTML
 		$html .= application::htmlUl ($data);
 		
