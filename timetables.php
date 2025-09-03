@@ -368,7 +368,6 @@ class timetables extends frontControllerApplication
 			  `flaggedEventsNumber` int(11) NOT NULL COMMENT 'Number of events in the Flagged events list',
 			  `usersAutocomplete` VARCHAR(255) NULL COMMENT 'Users autocomplete URL',
 			  `usersExternalUrl` VARCHAR(255) NULL COMMENT 'Users database UI external URL',
-			  `anyUsernameAccess` enum('Yes','No') NOT NULL COMMENT 'Whether access is available to anyone with a username (rather than just those in a list of people)',
 			  `calendarName` VARCHAR(255) NOT NULL DEFAULT 'calendar' COMMENT 'iCal calendar name',
 			  `wideCss` VARCHAR(255) NULL COMMENT 'CSS for wide layout',
 			  `lectureCaptureStartMinutes` INT NOT NULL DEFAULT '5' COMMENT 'Lecture capture - exclude minutes at start',
