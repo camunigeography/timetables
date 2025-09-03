@@ -1970,6 +1970,11 @@ class timetables extends frontControllerApplication
 	# Function to implement the export of bookings as iCal
 	private function exportBookingsIcs ($bookings, $title = false)
 	{
+		# Ensure there is a token, otherwise replace the bookings list with bogus entries informing the user to (re)create the feed correctly
+		if (!isSet ($_GET['token']) || !strlen ($_GET['token']) || !$this->validIcsToken ($_GET['token'])) {
+			$bookings = $this->tokenlessBookingsList ();
+		}
+		
 		# Compile the bookings data
 		$events = array ();
 		foreach ($bookings as $id => $booking) {
@@ -2003,6 +2008,42 @@ class timetables extends frontControllerApplication
 		
 		# Return the data; this is then served with output buffering
 		return $icalString;
+	}
+	
+	
+	# Function to validate an ICS token
+	private function validIcsToken ($token)
+	{
+		# Return where the token exists
+		return (bool) $this->databaseConnection->selectOneField ($this->settings['database'], 'users', 'token', array ('token' => $token));
+	}
+	
+	
+	# Function to create bogus bookings as an upgrade message
+	private function tokenlessBookingsList ()
+	{
+		# Create a set of bookings for the coming period, each with an upgrade message
+		$bookings = array ();
+		$timestamp = time ();
+		for ($day = 0; $day < 28; $day++) {	// 4 weeks
+			$url = preg_replace ('/(.+)timetable.ics.*$/', '\1', $_SERVER['_PAGE_URL']) . '#ical';		// Equivalent page, maintaining the specific person/activity/room where relevant
+			$bookings[] = array (
+				'name'				=> 'ACTION NEEDED',
+				'activityName'		=> 'This timetable feed needs to be updated',
+				'notes'				=> 'You are trying to view an outdated version of the timetable feed. Please go to ' . $url . ' in the timetable system to recreate it. This will only take a moment to fix. Please remove this existing feed.',
+				'url'				=> $url,
+				'startTime'			=> DateTime::createFromFormat ('Y-m-d H:i:s', (new DateTime ())->setTimestamp ($timestamp)->format ('Y-m-d 00:00:00'))->getTimestamp (),
+				'untilTime'			=> DateTime::createFromFormat ('Y-m-d H:i:s', (new DateTime ())->setTimestamp ($timestamp)->format ('Y-m-d 23:59:59'))->getTimestamp (),
+				'bookedForUserid'	=> '',
+				'draft'				=> false,
+				'roomName'			=> '',
+				'buildingName'		=> '',
+			);
+			$timestamp += (60 * 60 * 24);	// Leap years etc. are not critical here; this approximation is good enough
+		}
+		
+		# Return the bogus bookings list
+		return $bookings;
 	}
 	
 	
