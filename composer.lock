@@ -291,16 +291,16 @@
         },
         {
             "name": "libpurecontent/ical",
-            "version": "v1.1.1",
+            "version": "v1.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/libpurecontent/ical.git",
-                "reference": "d46825e276c47af25217ff3b32607d32c38698ed"
+                "reference": "66ba22287a8c4f2470c88bc2a8785c051ecddb7d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/libpurecontent/ical/zipball/d46825e276c47af25217ff3b32607d32c38698ed",
-                "reference": "d46825e276c47af25217ff3b32607d32c38698ed",
+                "url": "https://api.github.com/repos/libpurecontent/ical/zipball/66ba22287a8c4f2470c88bc2a8785c051ecddb7d",
+                "reference": "66ba22287a8c4f2470c88bc2a8785c051ecddb7d",
                 "shasum": ""
             },
             "type": "library",
@@ -321,9 +321,9 @@
             "description": "PHP library ical within the pureContent library suite",
             "support": {
                 "issues": "https://github.com/libpurecontent/ical/issues",
-                "source": "https://github.com/libpurecontent/ical/tree/v1.1.1"
+                "source": "https://github.com/libpurecontent/ical/tree/v1.1.2"
             },
-            "time": "2025-04-15T14:41:54+00:00"
+            "time": "2025-09-04T10:25:03+00:00"
         },
         {
             "name": "libpurecontent/image",
@@ -1006,10 +1006,10 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
-    "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "platform": {},
+    "platform-dev": {},
+    "plugin-api-version": "2.6.0"
 }
