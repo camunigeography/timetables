@@ -5605,6 +5605,7 @@ class timetables extends frontControllerApplication
 		
 		# Introduction
 		$html .= "\n" . '<p>This page enables you to import all the bookings that have lecture capture enabled into Panopto, using the Panopto Bulk Scheduling Tool.</p>';
+		$html .= "\n" . '<p>The list below is of <strong>all bookings in rooms which have a lecture capture recorder defined, on courses which have a lecture capture folder defined</strong>. Bookings that are specifically exempted from lecture capture in the booking are then excluded.</p>';
 		$html .= "\n" . '<p>The tool must first be installed on your computer, as per the <a href="https://support.panopto.com/s/article/scheduling-tool" target="_blank">Panopto Bulk Scheduling Tool installation instructions</a>.</p>';
 		$html .= "\n" . '<p>You must also have a username and password that is enabled with the Videographer privilege.</p>';
 		$html .= "\n" . "<p>Currently the timings are set to {$this->settings['lectureCaptureStartMinutes']} minutes from the start and {$this->settings['lectureCaptureEndMinutes']} minutes before the end. System administrators can change this on the <a href=\"{$this->baseUrl}/settings.html\">settings</a> page.</p>";
