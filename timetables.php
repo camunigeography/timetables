@@ -1835,7 +1835,7 @@ class timetables extends frontControllerApplication
 			# Add CSS for grid
 			if ($format == 'grid') {
 				if ($this->settings['wideCss']) {
-					$panes[$format] .= "\n\t" . '<style type="text/css">' . htmlspecialchars ($this->settings['wideCss']) . '</style>' . "\n";
+					$panes[$format] .= "\n\t" . '<style>' . htmlspecialchars ($this->settings['wideCss']) . '</style>' . "\n";
 				}
 			}
 			
@@ -1874,7 +1874,7 @@ class timetables extends frontControllerApplication
 			if ($format == 'grid') {
 				$ieMarginBug = (preg_match ('/(?i)msie [8|9]/', $_SERVER['HTTP_USER_AGENT']) ? 10 : 0);
 				$this->settings['dayHeightPx'] += $ieMarginBug;
-				$panes[$format] .= "\n\n" . '<style type="text/css">#timetables #grid .week .day {height: ' . ($this->settings['dayHeightPx']) . 'px;}</style>' . "\n";
+				$panes[$format] .= "\n\n" . '<style>#timetables #grid .week .day {height: ' . ($this->settings['dayHeightPx']) . 'px;}</style>' . "\n";
 			}
 			
 			# Add the week grid for each week
@@ -3064,7 +3064,7 @@ class timetables extends frontControllerApplication
 		<html lang="en">
 		<head>
 			<title>Today\'s timetable</title>
-			<style type="text/css" media="all">
+			<style media="all">
 				body {margin: 0; padding: 20px;}
 				body {font-size: 82%;}
 				body, input, textarea, select {font-family: arial, helvetica, sans-serif; color: #333;}
