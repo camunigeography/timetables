@@ -1612,7 +1612,7 @@ class timetables extends frontControllerApplication
 		$excludeSuppressed = (!$this->userIsAdministrator);
 		
 		# Get the activities hierarchy
-		$data = $this->getRooms (false, false, true, false, $excludeSuppressed);
+		$data = $this->getRooms (false, false, true, false, $excludeSuppressed, $listConvertEntities = true, $listIndicateSuppressed = true);
 		
 		# End if no data
 		if (!$data) {
@@ -1629,8 +1629,8 @@ class timetables extends frontControllerApplication
 			foreach ($buildings as $building => $rooms) {
 				$roomsList = array ();
 				foreach ($rooms as $id => $name) {
-					$key = htmlspecialchars ($id);
-					$label = htmlspecialchars ($name);
+					$key = $id;		// Entities will have been converted in getRooms ()
+					$label = $name;	// Entities will have been converted in getRooms ()
 					if (isSet ($_GET['rooms']) && ($_GET['rooms'] == $key)) {$label = "<strong>{$label}</strong>";}
 					$roomsList[$id]  = "<a href=\"{$this->baseUrl}/rooms/{$key}/\">" . $label . '</a>';
 					if ($this->userIsEditor) {
@@ -1642,7 +1642,7 @@ class timetables extends frontControllerApplication
 			}
 			$list[] = htmlspecialchars ($type) . ':' . application::htmlUl ($buildingsList, 1);
 		}
-		$html .= application::htmlUl ($list);
+		$html .= application::htmlUl ($list, 0, 'roomslist');
 		
 		# Return the HTML
 		return $html;
@@ -5223,7 +5223,7 @@ class timetables extends frontControllerApplication
 	
 	
 	# Function to get the list of rooms, optionally limited to a specified ID (not moniker)
-	private function getRooms ($id = false, $includeNote = false, $splitByInternalExternal = true, $indexById = false, $excludeSuppressed = false)
+	private function getRooms ($id = false, $includeNote = false, $splitByInternalExternal = true, $indexById = false, $excludeSuppressed = false, $listConvertEntities = false, $listIndicateSuppressed = false)
 	{
 		# Ensure that, if an ID is supplied, it is numeric
 		if ($id !== false && !ctype_digit ($id)) {return false;}
@@ -5247,7 +5247,8 @@ class timetables extends frontControllerApplication
 				rooms.note AS roomNote,
 				buildings.name as buildingName,
 				CONCAT_WS(', ',rooms.name,buildings.name) AS name,
-				" . ($splitByInternalExternal ? "IF(buildings.isInternal=1,'Internal','External')" : "'-'" /* Same string (dash) to be used below */) . " AS isInternal
+				" . ($splitByInternalExternal ? "IF(buildings.isInternal=1,'Internal','External')" : "'-'" /* Same string (dash) to be used below */) . " AS isInternal,
+				suppressedFromListingsByDefault
 			FROM rooms
 			LEFT JOIN buildings ON rooms.buildingId = buildings.id
 			WHERE " . ($where ? implode (' AND ', $where) : '1=1') . "
@@ -5286,10 +5287,22 @@ class timetables extends frontControllerApplication
 			foreach ($data as $type => $buildings) {
 				foreach ($buildings as $building => $rooms) {
 					foreach ($rooms as $key /* moniker or id */ => $attributes) {
+						if ($listConvertEntities) {
+							$key = htmlspecialchars ($key);
+							$attributes['roomName'] = htmlspecialchars ($attributes['roomName']);
+							if ($attributes['roomNote']) {
+								$attributes['roomNote'] = htmlspecialchars ($attributes['roomNote']);
+							}
+						}
 						$data[$type][$building][$key] = $attributes['roomName'];		// Shorter version of the room name, since the context is already in the hierarchy
 						if ($includeNote) {
 							if ($attributes['roomNote']) {
 								$data[$type][$building][$key] .= ' - *' . $attributes['roomNote'] . '*';
+							}
+						}
+						if ($listIndicateSuppressed) {
+							if ($attributes['suppressedFromListingsByDefault']) {
+								$data[$type][$building][$key] = '<span>' . $data[$type][$building][$key] . '</span>';
 							}
 						}
 					}
