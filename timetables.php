@@ -1608,8 +1608,11 @@ class timetables extends frontControllerApplication
 		# Start the HTML
 		$html = '';
 		
-		# Get the list of rooms
-		$data = $this->getRooms ();
+		# To avoid clutter, hide old entries from the listing (except admins)
+		$excludeSuppressed = (!$this->userIsAdministrator);
+		
+		# Get the activities hierarchy
+		$data = $this->getRooms (false, false, true, false, $excludeSuppressed);
 		
 		# End if no data
 		if (!$data) {
