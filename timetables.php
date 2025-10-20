@@ -2628,12 +2628,12 @@ class timetables extends frontControllerApplication
 			return false;
 		}
 		
-		# Get the rooms, as multidimensional listing, and attach any notes
-		$rooms = $this->getRooms (false, $includeNote = true, $splitByInternalExternal = false, $indexById = true);
-		
 		# Get the actions, action and ID
 		if (!$actionsActionId = $this->getActionsActionId ()) {return false;}
 		list ($actions, $action, $id, $linkId) = $actionsActionId;
+		
+		# Get the rooms, as multidimensional listing, and attach any notes
+		$rooms = $this->getRooms (false, $includeNote = true, $splitByInternalExternal = false, $indexById = true, $excludeSuppressed = ($action == 'add'));
 		
 		# Define dataBinding overrides
 		$dataBindingParameters = array (
@@ -2651,7 +2651,6 @@ class timetables extends frontControllerApplication
 				'hideFromDisplayBoard' => array ('title' => "Hide from <a href=\"{$this->baseUrl}/today/\" target=\"_blank\" title=\"[Link opens in a new window]\">display board listing</a>?"),
 				'bookedByUserid'  => ($this->settings['usersAutocomplete'] ? array ('autocomplete' => $this->settings['usersAutocomplete'], 'autocompleteOptions' => array ('delay' => 0), 'description' => 'Type a surname or username; one person per line only', ) : array ()),	// Will only take effect when visible, i.e. on the search page
 				'updatedByUserid' => ($this->settings['usersAutocomplete'] ? array ('autocomplete' => $this->settings['usersAutocomplete'], 'autocompleteOptions' => array ('delay' => 0), 'description' => 'Type a surname or username; one person per line only', ) : array ()),	// Will only take effect when visible, i.e. on the search page
-				
 			),
 		);
 		
@@ -5221,7 +5220,7 @@ class timetables extends frontControllerApplication
 	
 	
 	# Function to get the list of rooms, optionally limited to a specified ID (not moniker)
-	private function getRooms ($id = false, $includeNote = false, $splitByInternalExternal = true, $indexById = false)
+	private function getRooms ($id = false, $includeNote = false, $splitByInternalExternal = true, $indexById = false, $excludeSuppressed = false)
 	{
 		# Ensure that, if an ID is supplied, it is numeric
 		if ($id !== false && !ctype_digit ($id)) {return false;}
@@ -5232,6 +5231,9 @@ class timetables extends frontControllerApplication
 		if ($id) {
 			$where[] = 'rooms.id = :roomId';
 			$preparedStatementValues['roomId'] = $id;
+		}
+		if ($excludeSuppressed) {
+			$where[] = "(suppressedFromListingsByDefault IS NULL OR suppressedFromListingsByDefault = '')";
 		}
 		
 		# Get the rooms
