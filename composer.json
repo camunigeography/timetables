@@ -9,7 +9,7 @@
         "libpurecontent/jquery": "^1.1",
         "libpurecontent/timedate": "^1.4",
         "libpurecontent/ical": "^1.1",
-        "libpurecontent/csv": "^1.5",
+        "libpurecontent/csv": "^1.6",
         "libpurecontent/pagination": "^1.1",
         "libpurecontent/multisearch": "^1.3",
         "libpurecontent/hierarchy": "^1.2",
