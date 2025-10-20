@@ -857,7 +857,7 @@ class timetables extends frontControllerApplication
 			if ($forceListing) {
 				$html .= $listing;
 			} else {
-				$html .= "\n" . '<script type="text/javascript" src="/sitetech/collapsable.js"></script>';
+				$html .= "\n" . '<script src="/sitetech/collapsable.js"></script>';
 				$html .= "\n" . '<dl class="collapsable faq">';
 				$html .= "\n\t" . "<dt>Or click to view and select {$typeDescription}&hellip;</dt>";
 				$html .= "\n\t" . '<dd>' . $listing . '</dd>';
@@ -1548,7 +1548,7 @@ class timetables extends frontControllerApplication
 		if ($this->userIsEditor && $editorsSeeLinks) {
 			$html .= "\n<p>As an Editor, you can click on the [edit] link to edit its details, or [+] to add a new area of activity within that item.</p>";
 		}
-		// $html .= '<script type="text/javascript" src="/sitetech/pde.js"></script>';
+		// $html .= '<script src="/sitetech/pde.js"></script>';
 		#!# Need to be able to specify that some sections, e.g. year groups under the main taught course section have an expandable arrow by default
 		$html .= hierarchy::asUl ($this->activitiesHierarchy, "{$this->baseUrl}/activities/", ($this->userIsEditor && $editorsSeeLinks ? 'add.html?parent=%s' : ''), ($this->userIsEditor && $editorsSeeLinks ? '%s/edit.html' : ''), 'hideFromNew', $currentNodeId, 'hierarchicallisting', $highlightProperty = 'highlighted');
 		
@@ -1889,7 +1889,7 @@ class timetables extends frontControllerApplication
 		$html .= $jQuery->getHtml ();
 		
 		# Add tooltip support, to show the tooltips using a larger and more immediate bubble; see: https://jqueryui.com/tooltip/
-		$html .= "\n\n\n<!-- jQuery UI -->\n" . '<script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>';
+		$html .= "\n\n\n<!-- jQuery UI -->\n" . '<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>';
 		$html .= "\n\t" . "<script>
 			$(function () {
 				$('div.week ul.bookings div').tooltip ({
@@ -2568,7 +2568,7 @@ class timetables extends frontControllerApplication
 		
 		# Create the table
 		$headings = $this->databaseConnection->getHeadings ($this->settings['database'], 'bookings');
-		$html .= "\n" . '<!-- Enable table sortability: --><script language="javascript" type="text/javascript" src="/sitetech/sorttable.js"></script>';
+		$html .= "\n" . '<!-- Enable table sortability: --><script src="/sitetech/sorttable.js"></script>';
 		$html .= application::htmlTable ($bookings, $headings, 'lines sortable" id="sortable', $keyAsFirstColumn = false, false, $allowHtml = true, $showColons = false, $addCellClasses = false, $addRowKeyClasses = false, $onlyFields = array (), $compress = false, $showHeadings = true, $encodeEmailAddress = true);
 		
 		# Return the HTML
@@ -3725,7 +3725,7 @@ class timetables extends frontControllerApplication
 		}
 		
 		# Show the HTML
-		$html  = "\n" . '<!-- Enable table sortability: --><script language="javascript" type="text/javascript" src="/sitetech/sorttable.js"></script>';
+		$html  = "\n" . '<!-- Enable table sortability: --><script src="/sitetech/sorttable.js"></script>';
 		$html .= application::htmlTable ($data, $headings, 'lines sortable datalist" id="sortable', $keyAsFirstColumn = false, false, $allowHtml = true, $showColons = false, $addCellClasses = true, $addRowKeyClasses = false, $onlyFields = array (), $compress = false, $showHeadings = true, $encodeEmailAddress = true);
 		
 		# Return the HTML
