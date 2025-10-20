@@ -5226,6 +5226,14 @@ class timetables extends frontControllerApplication
 		# Ensure that, if an ID is supplied, it is numeric
 		if ($id !== false && !ctype_digit ($id)) {return false;}
 		
+		# Compile conditions
+		$where = array ();
+		$preparedStatementValues = array ();
+		if ($id) {
+			$where[] = 'rooms.id = :roomId';
+			$preparedStatementValues['roomId'] = $id;
+		}
+		
 		# Get the rooms
 		$query = "SELECT
 				rooms.id,
@@ -5237,14 +5245,14 @@ class timetables extends frontControllerApplication
 				" . ($splitByInternalExternal ? "IF(buildings.isInternal=1,'Internal','External')" : "'-'" /* Same string (dash) to be used below */) . " AS isInternal
 			FROM rooms
 			LEFT JOIN buildings ON rooms.buildingId = buildings.id
-			" . ($id ? " WHERE rooms.id = " . $this->databaseConnection->quote ($id) : '') . "
+			WHERE " . ($where ? implode (' AND ', $where) : '1=1') . "
 			ORDER BY
 				isInternal DESC /* i.e. Internal before External */,
 				buildingName,
 				roomName
 		;";
 		$databaseFunction = ($id ? 'getOne' : 'getData');
-		$data = $this->databaseConnection->{$databaseFunction} ($query, "{$this->settings['database']}.rooms");
+		$data = $this->databaseConnection->{$databaseFunction} ($query, "{$this->settings['database']}.rooms", true, $preparedStatementValues);
 		
 		#!# Hierarchy needs natsorting
 		
