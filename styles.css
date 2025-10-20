@@ -51,6 +51,8 @@ body .tooltip {max-width: 300px; padding: 12px; border-radius: 5px; border-color
 #timetables ul.objectlist li {font-weight: bold;}
 #timetables ul.hierarchicallisting li {margin-top: 5px; margin-bottom: 5px;}
 #timetables ul.hierarchicallisting li span {opacity: 0.4;}
+#timetables li a.minilink {color: #bbb; border: 1px solid #ddd; padding: 0 3px; font-size: 0.81em;}
+#timetables li a.minilink:hover {text-decoration: none; background-color: #eee; border-color: #bbb;}
 #timetables ul.crudlist li.view, #timetables ul.crudlist li.draft {margin-left: 8px;}
 #timetables h2 span {opacity: 0.8;}
 #timetables h2 span {filter: alpha(opacity=80); -moz-opacity: 0.8; -khtml-opacity: 0.8;}	/* Vendor-specific hacks */
