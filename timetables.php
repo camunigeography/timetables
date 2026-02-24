@@ -817,7 +817,7 @@ class timetables extends frontControllerApplication
 		}
 		
 		# Determine limitations, by parsing the URL
-		list ($where, $linkableParameters, $listing, $forceListing, $breadcrumbEntries, $typeDescription, $highlightBookings, $introductoryText) = $this->whereClauses ($filterParameters);
+		list ($where, $preparedStatementValues, $linkableParameters, $listing, $forceListing, $breadcrumbEntries, $typeDescription, $highlightBookings, $introductoryText) = $this->whereClauses ($filterParameters);
 		
 		# End if the limitation parsing found any errors, e.g. invalid dates, invalid weeks, etc.
 		if (!is_array ($where)) {
@@ -838,7 +838,7 @@ class timetables extends frontControllerApplication
 			} else {
 				$where['date_implicit_from'] = "`date` >= '" . date ('Y-m-d') . "'";
 			}
-			$bookings = $this->getBookings ($where);
+			$bookings = $this->getBookings ($where, $preparedStatementValues);
 			$title = end ($breadcrumbEntries);
 			$this->exportBookings ($bookings, $this->export, $title);
 			return;
@@ -876,7 +876,7 @@ class timetables extends frontControllerApplication
 		}
 		
 		# Get the bookings
-		$bookings = $this->getBookings ($where);
+		$bookings = $this->getBookings ($where, $preparedStatementValues);
 		
 		# Create the listing
 		$html .= $this->createListing ($bookings, $where, $linkableParameters, $highlightBookings);
@@ -896,6 +896,7 @@ class timetables extends frontControllerApplication
 	{
 		# Start an array of WHERE limitations; those involving date-based limitation must have keys prefixed with date_ so that non-date-related keys do not crash the seededDates lookup (which has only a date field)
 		$where = array ();
+		$preparedStatementValues = array ();
 		
 		# Set a default type description (e.g. 'weeks', 'people', etc.)
 		$typeDescription = 'others';
@@ -931,9 +932,11 @@ class timetables extends frontControllerApplication
 					
 					# Get the items
 					$whereBookingsList = array ();
+					$preparedStatementValuesBookingsList = array ();
+					#!# Convert to prepared statements (though values are already validated)
 					$whereBookingsList[] = 'bookings.id IN (' . implode (',', $ids) . ')';
 					$whereBookingsList['suppressedFromListingsByDefault'] = false;	// i.e. do not perform this check
-					if ($items = $this->getBookings ($whereBookingsList)) {		// Validate the booking(s) exists
+					if ($items = $this->getBookings ($whereBookingsList, $preparedStatementValuesBookingsList)) {		// Validate the booking(s) exists
 						$totalFound = count ($items);
 						$firstBookingId = key ($items);
 						reset ($items);
@@ -1127,10 +1130,11 @@ class timetables extends frontControllerApplication
 		
 		//application::dumpData ($filterParameters);
 		//application::dumpData ($where);
+		//application::dumpData ($preparedStatementValues);
 		//application::dumpData ($linkableParameters);
 		
 		# Return the data
-		return array ($where, $linkableParameters, $listingHtml, $forceListing, $breadcrumbEntries, $typeDescription, $highlightBookings, $introductoryText);
+		return array ($where, $preparedStatementValues, $linkableParameters, $listingHtml, $forceListing, $breadcrumbEntries, $typeDescription, $highlightBookings, $introductoryText);
 	}
 	
 	
@@ -1672,7 +1676,7 @@ class timetables extends frontControllerApplication
 	
 	
 	# Function to get the bookings
-	private function getBookings ($where = array (), $hyperlinkNames = true)
+	private function getBookings ($where = array (), $preparedStatementValues = array (), $hyperlinkNames = true)
 	{
 		# If the user is not an editor, exclude draft bookings
 		if (!$this->userIsEditor) {
@@ -1730,7 +1734,7 @@ class timetables extends frontControllerApplication
 		;";
 		
 		# Get the data
-		$bookings = $this->databaseConnection->getData ($query, "{$this->settings['database']}.bookings");
+		$bookings = $this->databaseConnection->getData ($query, "{$this->settings['database']}.bookings", true, $preparedStatementValues);
 		
 		// application::dumpData ($bookings);
 		// application::dumpData ($this->databaseConnection->error ());
@@ -3021,13 +3025,14 @@ class timetables extends frontControllerApplication
 		
 		# Set to today only
 		$where = array ();
+		$preparedStatementValues = array ();
 		$where['date_implicit_from'] = "`date` = '" . date ('Y-m-d') . "'";
 		
 		# Hide hidden bookings
 		$where['hide'] = "(hideFromDisplayBoard IS NULL or hideFromDisplayBoard = '')";
 		
 		# Get the bookings
-		$bookings = $this->getBookings ($where);
+		$bookings = $this->getBookings ($where, $preparedStatementValues);
 		
 		# Filter bookings that have already passed
 		$bookingAtStartOfDay = count ($bookings);
@@ -5682,12 +5687,13 @@ class timetables extends frontControllerApplication
 		# Get the bookings, where there is both a lecture capture folder set directly for the area of activity (NB hierarchy not currently supported), and the venue has a recorder set
 		$this->userIsEditor = true;		// Workaround for getBookings having a built-in WHERE clause
 		$where = array ();
+		$preparedStatementValues = array ();
 		$where[] = 'lectureCaptureFolder IS NOT NULL';
 		$where[] = 'lectureCaptureRecorderName IS NOT NULL';
 		$where[] = "(lectureCapture IS NULL OR lectureCapture = '')";	// I.e. not 'Explicitly disable'
 		$where[] = '(draft != 1 OR draft IS NULL)';
 		$where[] = "CONCAT(date,' ',startTime) >= NOW()";
-		$bookings = $this->getBookings ($where, $hyperlinkNames = false);
+		$bookings = $this->getBookings ($where, $preparedStatementValues, $hyperlinkNames = false);
 		
 		# Adjust the booking start/finish times for lecture capture if required
 		foreach ($bookings as $id => $booking) {
