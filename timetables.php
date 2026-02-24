@@ -989,7 +989,8 @@ class timetables extends frontControllerApplication
 				# Rooms
 				case 'rooms':
 					if ($item = $this->getRooms ($filterParameters['id'])) {		// Validate the room exists
-						$where[$objectType] = 'roomId = ' . $this->databaseConnection->quote ($item['id']);
+						$where[$objectType] = 'roomId = :roomId';
+						$preparedStatementValues['roomId'] = $item['id'];
 						$linkableParameters['roomId'] = $item['id'];
 						$listingHtml = $this->roomsLinks ();
 						$breadcrumbEntries = $this->registerBreadcrumbEntries ($breadcrumbEntries, $objectType, $item['name']);
