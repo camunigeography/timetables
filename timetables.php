@@ -961,11 +961,7 @@ class timetables extends frontControllerApplication
 				case 'activities':
 					if ($item = $this->getActivities ($filterParameters['id'])) {		// Validate the activity exists
 						$activitiesFamilyIds = $this->getActivities (false, $item['id']);
-						$activitiesFamilyIdsQuoted = array ();
-						foreach ($activitiesFamilyIds as $activitiesFamilyId => $activity) {
-							$activitiesFamilyIdsQuoted[] = $this->databaseConnection->quote ($activitiesFamilyId);
-						}
-						$where[$objectType] = 'areaOfActivityId IN (' . implode (',', $activitiesFamilyIdsQuoted) . ')';
+						$where[$objectType] = 'areaOfActivityId IN(' . implode (', ', array_keys ($activitiesFamilyIds)) . ')';	// Values are numeric keys from the database
 						$linkableParameters['areaOfActivityId'] = $item['id'];
 						$listingHtml = $this->activitiesLinks ($filterParameters['id']);
 						$breadcrumbEntries = $this->registerBreadcrumbEntries ($breadcrumbEntries, $objectType, $item['name']);
@@ -1182,7 +1178,7 @@ class timetables extends frontControllerApplication
 		
 		# Now deal with the areas of activity they are involved in
 		if ($areasOfActivityInvolvedIds = $this->getAreasOfActivityInvolved ($userIds)) {
-			$subclauses[] = 'areaOfActivityId IN (' . implode (',', $areasOfActivityInvolvedIds) . ')';	// These are numeric so do not need to be quoted
+			$subclauses[] = 'areaOfActivityId IN(' . implode (',', $areasOfActivityInvolvedIds) . ')';	// These are numeric so do not need to be quoted
 		}
 		
 		# Compile the result
@@ -5533,16 +5529,7 @@ class timetables extends frontControllerApplication
 		
 		# Get the activity hierarchy from the selected activity downards (not ancestors upwards), and register this list as a constraint
 		$activitiesFamilyIds = $this->getActivities (false, $activityId, $hideFromNew = false, $familyNodeIdIncludeAncestors = false);
-		$activitiesFamilyIdsQuoted = array ();
-		$i = 0;
-		$placeholders = array ();
-		foreach ($activitiesFamilyIds as $activitiesFamilyId => $activity) {
-			$placeholder = "activity{$i}";
-			$preparedStatementValues[$placeholder] = $activitiesFamilyId;
-			$placeholders[] = ':' . $placeholder;
-			$i++;
-		}
-		$where[] = 'areaOfActivityId IN (' . implode (', ', $placeholders) . ')';
+		$where[] = 'areaOfActivityId IN(' . implode (', ', array_keys ($activitiesFamilyIds)) . ')';	// Values are numeric keys from the database
 		
 		# Add date constraints
 		$where[] = 'date >= :startDate';
