@@ -1202,13 +1202,16 @@ class timetables extends frontControllerApplication
 		
 		# Determine the subclauses
 		$subclauses = array ();
-		foreach ($userIds as $userId) {
-			$subclauses[] = 'people LIKE ' . $this->databaseConnection->quote ('%|' . $userId . '|%');
+		$preparedStatementValues = array ();
+		foreach ($userIds as $index => $userId) {
+			$placeholder = 'user_' . $index;
+			$subclauses[] = "people LIKE :{$placeholder}";
+			$preparedStatementValues[$placeholder] = '%|' . $userId . '|%';
 		}
 		
 		# Get the data
 		$query = "SELECT id FROM {$this->settings['database']}.areaOfActivity WHERE (" . implode (' OR ', $subclauses) . ')';
-		$areasOfActivityIds = $this->databaseConnection->getPairs ($query);
+		$areasOfActivityIds = $this->databaseConnection->getPairs ($query, false, $preparedStatementValues);
 		
 		# Return the result
 		return $areasOfActivityIds;
