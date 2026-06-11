@@ -373,6 +373,7 @@ class timetables extends frontControllerApplication
 			  `lectureCaptureStartMinutes` INT NOT NULL DEFAULT '5' COMMENT 'Lecture capture - exclude minutes at start',
 			  `lectureCaptureEndMinutes` INT NOT NULL DEFAULT '5' COMMENT 'Lecture capture - exclude minutes at end',
 			  `lectureCaptureTitlePrefix` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Lecture capture title prefix',
+			  `lectureCaptureFolderPrefix` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Lecture capture folder prefix',
 			  PRIMARY KEY (`id`)
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Settings';
 			
@@ -2863,6 +2864,7 @@ class timetables extends frontControllerApplication
 				'people' => $this->expandablePeopleFieldSpec (),
 				'moniker' => array ('regexp' => '^([-0-9a-z]{1,40})$', 'prepend' => $this->baseUrl . '/' . __FUNCTION__ . '/', 'append' => '/', 'size' => 20, ),
 				'shortname' => array ('description' => 'This will be added to the title of <strong>all</strong> bookings below this level of activity', ),
+				'lectureCaptureFolder' => array ('description' => ($this->settings['lectureCaptureFolderPrefix'] ? "Must start {$this->settings['lectureCaptureFolderPrefix']} if present, and the folder must exist on Panopto matching exactly what is entered here" : ''), 'regexp' => ($this->settings['lectureCaptureFolderPrefix'] ? '^' . $this->settings['lectureCaptureFolderPrefix'] : ''), ),
 			),
 		);
 		
