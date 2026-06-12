@@ -4196,6 +4196,15 @@ class timetables extends frontControllerApplication
 			}
 		}
 		
+		# Prevent deletion of areas of activity when it has non-hidden children; only a direct child check is needed because, due to this same code, any grandchildren would have to be hidden before a child can be hidden
+		if ($table == 'areaOfActivity') {
+			if ($hasChildActiveAreasOfActivity = $this->databaseConnection->select ($this->settings['database'], 'areaOfActivity', array ('parentId' => $data['id'], 'hideFromNew' => NULL))) {
+				$html  = "\n<p>You cannot delete this area of activity because it has other non-hidden areas of activity within it it.</p>";
+				$html .= "\n<p>Please instead <a href=\"{$this->baseUrl}/activities/\">go to the listing page</a> and set to hide those first.</p>";
+				return $html;
+			}
+		}
+		
 		# If there is a series field and it contains a value, run in series mode
 		$seriesListing = $this->seriesListing ($data, $table);
 		
