@@ -4954,6 +4954,7 @@ class timetables extends frontControllerApplication
 			}
 			if (!$data) {
 				$errorHtml = 'Error: ' . $this->hierarchy->getError ();
+				error_log ('Timetable system - ' . $errorHtml);
 				return false;
 			}
 		}
