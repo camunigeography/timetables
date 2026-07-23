@@ -4548,7 +4548,7 @@ class timetables extends frontControllerApplication
 					$totalClashes = count ($bookingClashes);
 					$form->checkboxes (array (
 						'name'			=> 'overrideClash',
-						'after'			=> '_heading1',
+						'after'			=> 'name_heading1',
 						'title'			=> 'Override clash checking?',
 						'values'		=> array ('1' => 'Yes, override ' . ($totalClashes == 1 ? 'clash' : "clashes ({$totalClashes})")),
 						'required' 		=> false,
