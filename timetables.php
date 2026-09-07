@@ -3200,93 +3200,93 @@ class timetables extends frontControllerApplication
 				IF(cohort = 'Undergraduate', 0, 1),
 				eventType
 			;
-			";
-			
-			# Get the data
-			$entries = $this->databaseConnection->getData ($query);
-			
-			# End if no entries
-			if (!$entries) {
-				$html .= "\n<p><em>There are no matching entries for the selected " . htmlspecialchars ($this->settings['customYearLabel']) . '.</em></p>';
-				echo $html;
-				return;
-			}
-			
-			# Obtain all the users in the data, to enable a consistent set of row columns to be created; this will avoid duplicates and retain the order
-			$users = array ();
-			foreach ($entries as $entry) {
-				$users[$entry['username']] = application::arrayFields ($entry, array ('username', 'forename', 'surname', 'staffType'));
-			}
-			
-			# Obtain totals for each user
-			$totals = array ();
-			foreach ($entries as $entry) {
-				$totals[$entry['username']] = (isSet ($totals[$entry['username']]) ? $totals[$entry['username']] : 0) + $entry['totalHours'];
-			}
-			
-			# Regroup dataset by cohort and then event type, then index by username
-			$data = array ();
-			foreach ($entries as $entry) {
-				$data[$entry['cohort']][$entry['eventType']][$entry['username']] = $entry['totalHours'];
-			}
-			
-			# Start a table for presentation
-			$table = array ();
-			
-			# Initialise the titles; NB the row indexes are not for display but ensure uniqueness given that event types appear multiple times
-			$table['Username']['title'] = '<strong>Username</strong>';
-			$table['Forename']['title'] = '<strong>Forename</strong>';
-			$table['Surname']['title'] = '<strong>Surname</strong>';
-			$table['Staff type']['title'] = '<strong>Staff type</strong>';
-			foreach ($data as $cohort => $dataByCohort) {
-				$table[$cohort]['title'] = '<strong>' . htmlspecialchars ($cohort) . ':</strong>';
-				foreach ($dataByCohort as $eventType => $entries) {
-					$table["{$cohort}: {$eventType}"]['title'] = $eventType;
-				}
-			}
-			$table['Total']['title'] = '<strong>Total</strong>';
-			
-			# Add data for each user along the row
-			foreach ($users as $username => $user) {
-				
-				# Names along the table
-				$table['Username'][] = $username;
-				$table['Forename'][] = $user['forename'];
-				$table['Surname'][]  = $user['surname'];
-				$table['Staff type'][]  = $user['staffType'];
-				
-				# Blocks for each cohort
-				foreach ($data as $cohort => $dataByCohort) {
-					$table[$cohort][$username] = '';		// Heading row
-					foreach ($dataByCohort as $eventType => $entries) {
-						$table["{$cohort}: {$eventType}"][$username] = (isSet ($entries[$username]) ? $entries[$username] : '');
-					}
-				}
-				
-				# Total
-				$table['Total'][] = $totals[$username];
-			}
-			
-			# Add Javascript copy HTML function
-			$html .= "\n" . '<p><a href="#" id="copytoclipboard">Copy to clipboard<span id="copytoclipboardtick"></span></a></p>';
-			$html .= "\n" . "<script>
-				document.getElementById ('copytoclipboard').addEventListener ('click', function (e) {
-					const field = document.querySelector ('#datatable');
-					const range = document.createRange ();
-					range.selectNode (field);
-					window.getSelection ().addRange (range);
-					document.execCommand ('copy');
-					range.collapse ();
-					document.getElementById ('copytoclipboardtick').textContent = (' ✓');
-					e.preventDefault ();
-				});
-			</script>";
-			
-			# Render to an HTML table
-			$html .= application::htmlTable ($table, array (), 'border compressed small" id="datatable', $keyAsFirstColumn = false, false, array ('title'), false, false, false, array (), false, $showHeadings = false);
-			
-			# Show the HTML
+		";
+		
+		# Get the data
+		$entries = $this->databaseConnection->getData ($query);
+		
+		# End if no entries
+		if (!$entries) {
+			$html .= "\n<p><em>There are no matching entries for the selected " . htmlspecialchars ($this->settings['customYearLabel']) . '.</em></p>';
 			echo $html;
+			return;
+		}
+		
+		# Obtain all the users in the data, to enable a consistent set of row columns to be created; this will avoid duplicates and retain the order
+		$users = array ();
+		foreach ($entries as $entry) {
+			$users[$entry['username']] = application::arrayFields ($entry, array ('username', 'forename', 'surname', 'staffType'));
+		}
+		
+		# Obtain totals for each user
+		$totals = array ();
+		foreach ($entries as $entry) {
+			$totals[$entry['username']] = (isSet ($totals[$entry['username']]) ? $totals[$entry['username']] : 0) + $entry['totalHours'];
+		}
+		
+		# Regroup dataset by cohort and then event type, then index by username
+		$data = array ();
+		foreach ($entries as $entry) {
+			$data[$entry['cohort']][$entry['eventType']][$entry['username']] = $entry['totalHours'];
+		}
+		
+		# Start a table for presentation
+		$table = array ();
+		
+		# Initialise the titles; NB the row indexes are not for display but ensure uniqueness given that event types appear multiple times
+		$table['Username']['title'] = '<strong>Username</strong>';
+		$table['Forename']['title'] = '<strong>Forename</strong>';
+		$table['Surname']['title'] = '<strong>Surname</strong>';
+		$table['Staff type']['title'] = '<strong>Staff type</strong>';
+		foreach ($data as $cohort => $dataByCohort) {
+			$table[$cohort]['title'] = '<strong>' . htmlspecialchars ($cohort) . ':</strong>';
+			foreach ($dataByCohort as $eventType => $entries) {
+				$table["{$cohort}: {$eventType}"]['title'] = $eventType;
+			}
+		}
+		$table['Total']['title'] = '<strong>Total</strong>';
+		
+		# Add data for each user along the row
+		foreach ($users as $username => $user) {
+			
+			# Names along the table
+			$table['Username'][] = $username;
+			$table['Forename'][] = $user['forename'];
+			$table['Surname'][]  = $user['surname'];
+			$table['Staff type'][]  = $user['staffType'];
+			
+			# Blocks for each cohort
+			foreach ($data as $cohort => $dataByCohort) {
+				$table[$cohort][$username] = '';		// Heading row
+				foreach ($dataByCohort as $eventType => $entries) {
+					$table["{$cohort}: {$eventType}"][$username] = (isSet ($entries[$username]) ? $entries[$username] : '');
+				}
+			}
+			
+			# Total
+			$table['Total'][] = $totals[$username];
+		}
+		
+		# Add Javascript copy HTML function
+		$html .= "\n" . '<p><a href="#" id="copytoclipboard">Copy to clipboard<span id="copytoclipboardtick"></span></a></p>';
+		$html .= "\n" . "<script>
+			document.getElementById ('copytoclipboard').addEventListener ('click', function (e) {
+				const field = document.querySelector ('#datatable');
+				const range = document.createRange ();
+				range.selectNode (field);
+				window.getSelection ().addRange (range);
+				document.execCommand ('copy');
+				range.collapse ();
+				document.getElementById ('copytoclipboardtick').textContent = (' ✓');
+				e.preventDefault ();
+			});
+		</script>";
+		
+		# Render to an HTML table
+		$html .= application::htmlTable ($table, array (), 'border compressed small" id="datatable', $keyAsFirstColumn = false, false, array ('title'), false, false, false, array (), false, $showHeadings = false);
+		
+		# Show the HTML
+		echo $html;
 	}
 	
 	
