@@ -5652,7 +5652,7 @@ class timetables extends frontControllerApplication
 		
 		# If there are errors, list them
 		if (!$bookings) {
-			$html .= "\n" . '<p>There are no bookings with lecture capture enabled at present.</p>';
+			$html .= "\n" . '<p>There are no forthcoming bookings with lecture capture enabled at present.</p>';
 			echo $html;
 			return;
 		}
