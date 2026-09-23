@@ -1,7 +1,8 @@
 #timetables h3.weekcommencing {margin-top: 2em; font-size: 1.1em; padding: 0;}
-#timetables div.expandable {margin-top: 1.5em;}
-#timetables div.expandable h3 {margin-top: 0.2em;}
-#timetables div.expandable p.editorlink {position: absolute; left: 45em;}
+#timetables details:first-of-type {margin-top: 1.5em;}
+#timetables details {padding: 10px; border: 1px dotted #ccc;}
+#timetables details:has(summary:hover) {border-color: #aaa;}
+#timetables details summary {color: #0072cf;}
 #timetables div.datefilter {margin-top: 20px; padding: 1px 10px; border-top: 1px solid #eee; width: 33em; margin-left: auto; /* i.e. align (not float) it right */ position: relative; top: 1.2em;}
 #timetables div.datefilter + ul#switchabletabs {margin-top: 0;}
 #timetables .home h3.weekcommencing {clear: right;}

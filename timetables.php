@@ -515,39 +515,40 @@ class timetables extends frontControllerApplication
 		$html .= "\n<p>Welcome to the timetable system.</p>";
 		//$html .= "\n<p>You can view <a class=\"actions\" href=\"{$this->baseUrl}/my/\">" . '<img src="/images/icons/asterisk_orange.png" alt="" class="icon" />' . " My timetable</a> to view your timetable or browse through other listings:</p>";
 		
-		# Start a list of expandable panels
-		$panels = array ();
-		
 		# Add custom year links
 		#!# Should just show the current term weeks
 		if ($this->settings['customYearLabel']) {
-			$panels['customyears']  = "<h3>View timetable for " . htmlspecialchars ($this->settings['customYearLabel']) . '&hellip;</h3>';
-			$panels['customyears'] .= $this->yearLinks (true);
+			$html .= "\n<details>";
+			$html .= "\n\t<summary>View timetable for " . htmlspecialchars ($this->settings['customYearLabel']) . '&hellip;</summary>';
+			$html .= "\n\t" . $this->yearLinks (true);
+			$html .= "\n</details>";
 		}
 		
 		# Add year links
-		$panels['years']  = "<h3>View timetable for year&hellip;</h3>";
-		$panels['years'] .= $this->yearLinks ();
+		$html .= "\n<details>";
+		$html .= "\n\t<summary>View timetable for year&hellip;</summary>";
+		$html .= "\n\t" . $this->yearLinks ();
+		$html .= "\n</details>";
 		
 		# Add rooms
-		$panels['rooms']  = "<h3>View timetable for room&hellip;</h3>";
-		if ($this->userIsEditor) {$panels['rooms'] .= "<p class=\"editorlink\"><em>As an Editor, you can <a href=\"{$this->baseUrl}/rooms/\">edit this list</a>.</em></p>";}
-		$panels['rooms'] .= $this->roomsLinks ();
+		$html .= "\n<details>";
+		$html .= "\n\t<summary>View timetable for room&hellip;</summary>";
+		if ($this->userIsEditor) {$html .= "\n\t" . "<p class=\"editorlink\"><em>As an Editor, you can <a href=\"{$this->baseUrl}/rooms/\">edit this list</a>.</em></p>";}
+		$html .= "\n\t" . $this->roomsLinks ();
+		$html .= "\n</details>";
 		
 		# Add people links
-		$panels['people']  = "<h3>View timetable for person&hellip;</h3>";
-		$panels['people'] .= $this->peopleLinks ();
+		$html .= "\n<details>";
+		$html .= "\n\t<summary>View timetable for person&hellip;</summary>";
+		$html .= "\n\t" . $this->peopleLinks ();
+		$html .= "\n</details>";
 		
 		# Add activities links
-		$panels['activities']  = "<h3>View timetable for activity&hellip;</h3>";
-		if ($this->userIsEditor) {$panels['activities'] .= "<p class=\"editorlink\"><em>As an Editor, you can <a href=\"{$this->baseUrl}/activities/\">edit this list</a>.</em></p>";}
-		$panels['activities'] .= $this->activitiesLinks (false, false);
-		
-		# Convert the panels to an expandable listing
-		#!# Need to add state memory to this
-		$jQuery = new jQuery (/* $this->databaseConnection, "{$this->baseUrl}/data.html", $_SERVER['REMOTE_USER'] */ false, false, false, true);
-		$jQuery->expandable ($panels /*, $expandState, $saveState */);
-		$html .= $jQuery->getHtml ();
+		$html .= "\n<details>";
+		$html .= "\n\t<summary>View timetable for activity&hellip;</summary>";
+		if ($this->userIsEditor) {$html .= "\n\t" . "<p class=\"editorlink\"><em>As an Editor, you can <a href=\"{$this->baseUrl}/activities/\">edit this list</a>.</em></p>";}
+		$html .= "\n\t" . $this->activitiesLinks (false, false);
+		$html .= "\n</details>";
 		
 		# Get the HTML from the browsing listing
 		$html .= $this->browsingListing (array (), false, 'home');
