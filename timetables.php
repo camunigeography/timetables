@@ -5157,7 +5157,7 @@ class timetables extends frontControllerApplication
 	public function consolidate ($username = false)
 	{
 		# Start the HTML
-		$html = '';
+		$html = "\n<p>This form should be used when entries in the <a href=\"{$this->baseUrl}/people/\">People section</a> are specified as text rather than properly attached to actual people entries.</p>";
 		
 		# Get all people
 		$people = $this->getPeople (false, false, false, $returnAsNameCompiled = true);
