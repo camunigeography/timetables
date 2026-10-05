@@ -608,7 +608,7 @@ class timetables extends frontControllerApplication
 		
 		# Add in the untilDate, which is always calculated
 		$startTimestamp = strtotime ($data['startDate'] . ' 01:01:00');
-		#!# Should be one day, but there is an orphaned week bug (but the actual bookings do not get shown on the orphaned week layout)
+		#!# Should be one day (not two), but there is an orphaned week bug (but the actual bookings do not get shown on the orphaned week layout)
 		$days = ($data['weeksAhead'] * 7) - 2;	// Minus one day to avoid an orphaned hour causing a whole week to display
 		$data['untilDate'] = date ('Y-m-d', $startTimestamp + (60*60*24 * $days));
 		
