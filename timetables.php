@@ -2603,7 +2603,7 @@ class timetables extends frontControllerApplication
 		$actions = array_merge ($mainObjectActions, $otherObjectActions);
 		
 		# Split out standalone pages
-		$standalonePages = array ('today', 'clone', 'lecturecapture');
+		$standalonePages = array ('today', 'teachingloads', 'clone', 'lecturecapture');
 		$otherPages = application::array_filter_keys ($actions, $standalonePages);
 		foreach ($standalonePages as $standalonePage) {
 			unset ($actions[$standalonePage]);
