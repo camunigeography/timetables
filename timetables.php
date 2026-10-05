@@ -2007,7 +2007,7 @@ class timetables extends frontControllerApplication
 			
 			# Add the entry
 			$events[$id] = array (
-				'title' => $booking['name'] . ' - ' . $booking['activityName'],
+				'title' => $booking['name'] . ($booking['activityNamePrefix'] ? ' (' . $booking['activityNamePrefix'] . ')' : '') . ' - ' . $booking['activityName'],
 				'draft' => $booking['draft'],
 				'startTime' => $booking['startTime'],
 				'untilTime' => $booking['untilTime'],
