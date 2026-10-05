@@ -4004,15 +4004,13 @@ class timetables extends frontControllerApplication
 		#!# Replace with a proper search that filters to the relevant object type
 		if ($action != 'bookings') {return false;}
 		
+		# Obtain submitted value
+		$submittedValue = (isSet ($_GET['search']) ? $_GET['search'] : '');
+		
 		# Compile the HTML and return it
-		$submittedValue = (isSet ($_GET['search']) ? htmlspecialchars ($_GET['search']) : '');
-		/*
-		return $html = "\n\n" . '<form class="minisearch" method="post" name="minisearchform" action="' . $this->baseUrl . "/{$action}/search.html" . '" enctype="application/x-www-form-urlencoded" accept-charset="UTF-8">
-			<input name="search" type="search" size="30" value="' . $submittedValue . '" /> <input type="submit" value="Search' . ($what ? ' ' . htmlspecialchars ($what) : '!') . '" class="button" />
-		</form>' . "\n";
-		*/
-		return $html = "\n\n" . '<form class="minisearch" method="post" name="minisearchform" action="' . $this->baseUrl . "/{$action}/search.html" . '" enctype="application/x-www-form-urlencoded" accept-charset="UTF-8">
-			<input name="search" type="search" size="20" value="' . $submittedValue . '" placeholder="Booking title search" /> <input type="submit" value="Search titles" class="button" />
+		return $html = "\n\n\t\t" . '<form class="minisearch" method="post" name="minisearchform" action="' . $this->baseUrl . "/{$action}/search.html" . '" accept-charset="UTF-8">
+			<input name="search" type="search" size="20" value="' . htmlspecialchars ($submittedValue) . '" placeholder="Booking title search" />
+			<input type="submit" value="Search titles" class="button" />
 		</form>' . "\n";
 	}
 	
