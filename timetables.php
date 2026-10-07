@@ -314,6 +314,7 @@ class timetables extends frontControllerApplication
 			  `name` varchar(255) NOT NULL COMMENT 'Name of room',
 			  `buildingId` int(11) DEFAULT NULL COMMENT 'Building',
 			  `moniker` varchar(40) NOT NULL COMMENT 'Timetable page web address (must be unique)',
+			  `capacity` VARCHAR(255) NULL COMMENT 'Capacity of room',
 			  `note` varchar(255) DEFAULT NULL COMMENT 'Note to other Editors',
 			  `ignoreClashes` TINYINT NULL DEFAULT NULL COMMENT 'Ignore clashes in clash-checking?',
 			  `lectureCaptureRecorderName` VARCHAR(255) NULL COMMENT 'Lecture capture recorder name',
