@@ -977,6 +977,8 @@ class timetables extends frontControllerApplication
 				case 'people':
 					if ($item = $this->getPeople ($filterParameters['id'])) {		// Validate the person exists
 						$where[$objectType] = $this->personClashCheckingWhereClause ($item['id']);
+						list ($where[$objectType], $preparedStatementValuesPersonClashChecking) = $this->personClashCheckingWhereClause ($item['id']);
+						$preparedStatementValues += $preparedStatementValuesPersonClashChecking;
 						$linkableParameters['bookedForUserid'] = $item['id'];
 						$listingHtml = $this->peopleLinks ();
 						$breadcrumbEntries = $this->registerBreadcrumbEntries ($breadcrumbEntries, $objectType, $item['name']);
@@ -1168,15 +1170,18 @@ class timetables extends frontControllerApplication
 	# Function to create a WHERE clause for clash checking of a person
 	private function personClashCheckingWhereClause ($userIdOrIds)
 	{
-		# Start a list of subclauses
+		# Start a list of subclauses and prepared statement values
 		$subclauses = array ();
+		$preparedStatementValues = array ();
 		
 		# Convert to an array
 		$userIds = (is_array ($userIdOrIds) ? $userIdOrIds : array ($userIdOrIds));
 		
-		# Start with a standard check of the user being directly booked
-		foreach ($userIds as $userId) {
-			$subclauses[] = 'bookedForUserid LIKE ' . $this->databaseConnection->quote ('%|' . $userId . '|%');
+		# Start with a standard check of the user being directly booked; users are present as e.g. |spqr1| so the pipe is needed and use of LIKE
+		foreach ($userIds as $index => $userId) {
+			$tokenName = 'personClashCheckingUserid' . $index;
+			$subclauses[] = "bookedForUserid LIKE :{$tokenName}";
+			$preparedStatementValues[$tokenName] = '%|' . $userId . '|%';
 		}
 		
 		# Now deal with the areas of activity they are involved in
@@ -1192,8 +1197,8 @@ class timetables extends frontControllerApplication
 			$sql = '(' . $sql . ')';
 		}
 		
-		# Return the SQL extract
-		return $sql;
+		# Return the SQL extract and prepared statement values
+		return array ($sql, $preparedStatementValues);
 	}
 	
 	
@@ -4745,7 +4750,8 @@ class timetables extends frontControllerApplication
 			# If usernames are being supplied, convert to a where clause based on these users
 			if ($usernamesString) {
 				$usernames = application::splitCombinedTokenList ($usernamesString);
-				$clashFieldsClauses[$field] = $this->personClashCheckingWhereClause ($usernames);
+				list ($clashFieldsClauses[$field], $preparedStatementValuesPersonClashChecking) = $this->personClashCheckingWhereClause ($usernames);
+				$preparedStatementValues += $preparedStatementValuesPersonClashChecking;
 			}
 		}
 		
