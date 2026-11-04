@@ -689,12 +689,13 @@ class timetables extends frontControllerApplication
 	
 	
 	# Function to save the implicit view dates to the user profile
+	#!# This should be scoped to temporary usage, so that it does not leave an old filter in place for next access; for now the cookie period has been reduced as a workaround
 	private function saveImplicitViewDates ($startDate, $weeksAhead)
 	{
 		# Set a cookie with this value
 		$cookieValue = $startDate . $this->settings['daterangeCookieSeparator'] . $weeksAhead . $this->settings['daterangeCookieSeparator'] . time ();
-		$thirtyDays = 7 * 24 * 60 * 60;
-		setcookie ($this->settings['daterangeCookieName'], $cookieValue, time () + $thirtyDays, $this->baseUrl . '/', $_SERVER['SERVER_NAME']);
+		$period = 2 * 60 * 60;		// Low time period, so that next user session doesn't pick up a temporary search
+		setcookie ($this->settings['daterangeCookieName'], $cookieValue, time () + $period, $this->baseUrl . '/', $_SERVER['SERVER_NAME']);
 		
 		# If there is a user, add/update the view dates into their profile
 		if ($this->user) {
