@@ -4784,11 +4784,14 @@ class timetables extends frontControllerApplication
 				AND (
 					" . implode (' OR ', $clashFieldsClauses) . "
 				)
-				" . ($editingId ? 'AND bookings.id != ' . $this->databaseConnection->quote ($editingId) : '') . "
+				" . ($editingId ? 'AND bookings.id != :editingId' : '') . "
 		;";
 		$preparedStatementValues['date'] = $formData['date'];
 		$preparedStatementValues['startTime'] = $formData['startTime'];
 		$preparedStatementValues['untilTime'] = $formData['untilTime'];
+		if ($editingId) {
+			$preparedStatementValues['editingId'] = $editingId;
+		}
 		$data = $this->databaseConnection->getData ($query, false, true, $preparedStatementValues);
 		
 		/*
