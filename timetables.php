@@ -1240,7 +1240,7 @@ class timetables extends frontControllerApplication
 		$preparedStatementValues = array ();
 		foreach ($userIds as $index => $userId) {
 			$placeholder = 'user_' . $index;
-			$subclauses[] = "people LIKE :{$placeholder}";
+			$subclauses[] = "people LIKE :{$placeholder} OR listsPeople LIKE :{$placeholder}";
 			$preparedStatementValues[$placeholder] = '%|' . $userId . '|%';
 		}
 		
@@ -4888,7 +4888,7 @@ class timetables extends frontControllerApplication
 				bookings.roomId,
 				bookings.bookedForUserid,
 				bookings.areaOfActivityid,
-				areaOfActivity.people AS areaOfActivityPeople,
+				REPLACE(CONCAT_WS('', areaOfActivity.people, areaOfActivity.listsPeople), '||', '|') AS areaOfActivityPeople,
 				DATE_FORMAT(date,'%W, %D %M, %Y') AS dateFormatted,
 				LOWER(DATE_FORMAT(date,'/%Y/%M/%e/')) AS dateLinkFormatted,
 				REPLACE(LOWER(DATE_FORMAT(CONCAT(date,' ',startTime),'%l.%i%p')),'.00','') as startTimeFormatted,
@@ -4996,8 +4996,22 @@ class timetables extends frontControllerApplication
 		# Get the activity or end
 		if (!$item = $this->getActivities ($activityId)) {return false;}
 		
-		# Return the string
-		return $item['people'];
+		# Merge the two pipe-separated/surrounded lists (and which may be empty)
+		$people = array ();
+		if ($item['people']) {
+			$people = array_merge ($people, explode ('|', trim ($item['people'], '|')));
+		}
+		if ($item['listsPeople']) {
+			$people = array_merge ($people, explode ('|', trim ($item['listsPeople'], '|')));
+		}
+		$people = array_unique ($people);
+		$people = implode ('|', $people);
+		if ($people) {
+			$people = '|' . $people . '|';
+		}
+		
+		# Return the list
+		return $people;
 	}
 	
 	
