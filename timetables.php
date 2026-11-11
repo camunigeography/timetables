@@ -248,6 +248,7 @@ class timetables extends frontControllerApplication
 			  `shortname` varchar(255) DEFAULT NULL COMMENT 'Optional short name',
 			  `moniker` varchar(40) NOT NULL COMMENT 'Timetable page web address (must be unique)',
 			  `createdOn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Automatic timestamp',
+			  `lists` text COMMENT 'Lists of people (from data feed) always associated with this activity (list ID, one per line)',
 			  `people` text COMMENT 'People always associated with this activity (usernames, one per line)',
 			  `website` varchar(255) DEFAULT NULL COMMENT 'Website',
 			  `lectureCaptureFolder` VARCHAR(255) NULL COMMENT 'Lecture capture folder',
@@ -2884,6 +2885,7 @@ class timetables extends frontControllerApplication
 			'int1ToCheckbox' => true,
 			'attributes' => array (
 				'parentId' => array ('values' => hierarchy::asIndentedListing ($this->activitiesHierarchy), ),
+				'lists' => $this->expandableListFieldSpec (),
 				'people' => $this->expandablePeopleFieldSpec (),
 				'moniker' => array ('regexp' => '^([-0-9a-z]{1,40})$', 'prepend' => $this->baseUrl . '/' . __FUNCTION__ . '/', 'append' => '/', 'size' => 20, ),
 				'shortname' => array ('description' => 'This will be added to the title of <strong>all</strong> bookings below this level of activity', ),
@@ -2914,6 +2916,64 @@ class timetables extends frontControllerApplication
 		);
 		
 		return $options;
+	}
+	
+	
+	# Function to define a standard expandable list (data feed lists) field
+	private function expandableListFieldSpec ()
+	{
+		# Get list dropdown values
+		$list = array ();
+		$listUrls = $this->parseUserListSetting ();
+		foreach ($listUrls as $id => $list) {
+			$lists[$id] = $list['label'];
+		}
+		
+		# Return the options
+		$options = array (
+			'type' => 'select',
+			'multiple' => true,
+			'expandable' => true,
+			'separator' => '|',
+			'separatorSurround' => true,
+			'defaultPresplit' => true,
+			'output' => array ('processing' => 'compiled'),
+			'values' => $lists,
+		);
+		
+		return $options;
+	}
+	
+	
+	# Function to parse out the list (data feed lists) specification in settings
+	private function parseUserListSetting ($getUsers = false)
+	{
+		#!# csv::csvtoArray is too buggy to use
+		$lists = array ();
+		$csv = explode ("\n", trim ($this->settings['listUrls']));
+		foreach ($csv as $row) {
+			list ($id, $label, $field, $url) = explode (',', trim ($row));
+			$lists[$id] = array (
+				'label' => $label,
+				'url' => str_replace ('%apiUsername', $this->settings['apiUsername'], $url),
+				'field' => $field,
+			);
+		}
+		
+		# Expand with getting users data, if required
+		if ($getUsers) {
+			foreach ($lists as $id => $list) {
+				if (!$json = file_get_contents ($list['url'])) {return false;}	// Terminate complete response on retrieval failure
+				if (!$data = json_decode ($json, true)) {return false;}			// Terminate complete response on retrieval failure
+				$lists[$id]['usernames'] = array ();
+				foreach ($data as $entry) {
+					$lists[$id]['usernames'][] = $entry[$list['field']];
+				}
+			}
+		}
+		
+		# Return the list
+		return $lists;
 	}
 	
 	
