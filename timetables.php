@@ -503,7 +503,7 @@ class timetables extends frontControllerApplication
 		);
 		
 		# Run the main settings system with the overriden attributes
-		return parent::settings ($dataBindingSettingsOverrides);
+		echo parent::settings ($dataBindingSettingsOverrides);
 	}
 	
 	
