@@ -4,6 +4,19 @@
 # Class to create an online timetable system
 class timetables extends frontControllerApplication
 {
+	# Class properties
+	public $userIsEditor;
+	private $hierarchy;
+	private $activitiesHierarchy;
+	private $days;
+	private $months;
+	private $hideFields;
+	private $userFields;
+	private $defaultDateState;
+	private $userProfile;
+	private $export;
+	
+	
 	# Function to assign defaults additional to the general application defaults
 	public function defaults ()
 	{
