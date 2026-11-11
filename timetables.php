@@ -3864,7 +3864,7 @@ class timetables extends frontControllerApplication
 			#!# Need to check what happens if none exist
 			$ancestors = array_reverse ($ancestors);
 			foreach ($ancestors as $ancestorId => $ancestor) {
-				if (strlen ($ancestor['shortname'])) {
+				if (strlen ($ancestor['shortname'] ?? '')) {
 					$shortnames[$areaOfActivityId][] = $ancestor['shortname'];
 				}
 			}
