@@ -29,6 +29,7 @@ class timetables extends frontControllerApplication
 			'table' => false,
 			'databaseStrictWhere' => true,
 			'administrators' => true,
+			'cronUsername' => 'cron',
 			'termLabels' => array (),
 			'usersExternalDatabase' => false,	// Must contain fields username,title,forename,surname
 			'dayHeightPx' => 112,
@@ -249,6 +250,7 @@ class timetables extends frontControllerApplication
 			  `moniker` varchar(40) NOT NULL COMMENT 'Timetable page web address (must be unique)',
 			  `createdOn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Automatic timestamp',
 			  `lists` text COMMENT 'Lists of people (from data feed) always associated with this activity (list ID, one per line)',
+			  `listsPeople` mediumtext COMMENT 'People always associated with this activity, from lists (auto-populated regularly)',
 			  `people` text COMMENT 'People always associated with this activity (usernames, one per line)',
 			  `website` varchar(255) DEFAULT NULL COMMENT 'Website',
 			  `lectureCaptureFolder` VARCHAR(255) NULL COMMENT 'Lecture capture folder',
@@ -492,6 +494,14 @@ class timetables extends frontControllerApplication
 			'timetable.csv'	=> 'csv',
 		);
 		$this->export = (isSet ($_GET['export']) && strlen ($_GET['export']) && isSet ($exportFormats[$_GET['export']]) ? $exportFormats[$_GET['export']] : false);
+	}
+	
+	
+	# Cron entry point
+	protected function cronJobs ()
+	{
+		# Update lists of people in areas of activity
+		$this->updateAreasOfActivityPeopleLists ();
 	}
 	
 	
@@ -2886,6 +2896,7 @@ class timetables extends frontControllerApplication
 			'attributes' => array (
 				'parentId' => array ('values' => hierarchy::asIndentedListing ($this->activitiesHierarchy), ),
 				'lists' => $this->expandableListFieldSpec (),
+				'listsPeople' => array ('editable' => false, 'description' => 'If using data feed above, this shows the current list of people represented by such list(s). This is updated from the data source every 15 minutes.'),
 				'people' => $this->expandablePeopleFieldSpec (),
 				'moniker' => array ('regexp' => '^([-0-9a-z]{1,40})$', 'prepend' => $this->baseUrl . '/' . __FUNCTION__ . '/', 'append' => '/', 'size' => 20, ),
 				'shortname' => array ('description' => 'This will be added to the title of <strong>all</strong> bookings below this level of activity', ),
@@ -2974,6 +2985,46 @@ class timetables extends frontControllerApplication
 		
 		# Return the list
 		return $lists;
+	}
+	
+	
+	# Function to update lists of people in areas of activity (via cron)
+	private function updateAreasOfActivityPeopleLists ()
+	{
+		# Get the available lists and obtain the data from each upstream source
+		$supportedLists = $this->parseUserListSetting (true);
+		
+		# End if error occurred, to avoid a working but slightly outdated list set being wiped out; the retrieval failure will have been notified
+		if ($supportedLists === false) {return;}
+		
+		# Get the lists in use in the areas of activity
+		$query = 'SELECT id,lists FROM areaOfActivity WHERE lists IS NOT NULL;';
+		$areasOfActivityLists = $this->databaseConnection->getPairs ($query);
+		
+		# For each area of activity that has such list(s), populate the listsPeople field
+		$updates = array ();
+		foreach ($areasOfActivityLists as $id => $lists) {
+			
+			# Start a list of all users across the lists for this area of activity
+			$listsPeople = array ();
+			
+			# Loop through each list and obtain the usernames, and order them, then register them
+			$listIds = explode ('|', trim ($lists, '|'));
+			foreach ($listIds as $listId) {
+				$usernames = $supportedLists[$listId]['usernames'];
+				sort ($usernames);		// Sorted within each list, but not overall
+				$listsPeople = array_merge ($listsPeople, $usernames);
+			}
+			
+			# Remove duplicates, maintaining order
+			$listsPeople = array_unique ($listsPeople);
+			
+			# Register the update, compiling the list to a string
+			$updates[$id] = array ('listsPeople' => '|' . implode ('|', $listsPeople) . '|');
+		}
+		
+		# Update the database
+		$this->databaseConnection->updateMany ($this->settings['database'], 'areaOfActivity', $updates);
 	}
 	
 	

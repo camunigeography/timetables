@@ -80,6 +80,7 @@ body .tooltip {max-width: 300px; padding: 12px; border-radius: 5px; border-color
 #timetables a.consolidate {color: #ccc; font-size: 0.8em; margin-left: 5px;}
 #timetables .dataform {margin-top: 25px;}
 #timetables .dataform table td:first-child, #timetables .dataform table th:first-child {width: 200px; padding-right: 10px;}
+#timetables table tr.listsPeople td.data {overflow-wrap: anywhere; color: gray; font-size: 1em;}
 /* https://css-tricks.com/snippets/css/prevent-long-urls-from-breaking-out-of-container/ */
 #timetables p.icslink {overflow-wrap: break-word; word-wrap: break-word; -ms-word-break: break-all; word-break: break-all; word-break: break-word; -moz-hyphens: auto; -webkit-hyphens: auto; hyphens: auto;}
 @media print {
