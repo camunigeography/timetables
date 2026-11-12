@@ -2896,7 +2896,7 @@ class timetables extends frontControllerApplication
 			'attributes' => array (
 				'parentId' => array ('values' => hierarchy::asIndentedListing ($this->activitiesHierarchy), ),
 				'lists' => $this->expandableListFieldSpec (),
-				'listsPeople' => array ('editable' => false, 'description' => 'If using data feed above, this shows the current list of people represented by such list(s). This is updated from the data source every 15 minutes.'),
+				'listsPeople' => array ('editable' => false, 'description' => 'If using data feed above, this shows the current list of people represented by such list(s). This is updated from the data source every 5 minutes.'),
 				'people' => $this->expandablePeopleFieldSpec (),
 				'moniker' => array ('regexp' => '^([-0-9a-z]{1,40})$', 'prepend' => $this->baseUrl . '/' . __FUNCTION__ . '/', 'append' => '/', 'size' => 20, ),
 				'shortname' => array ('description' => 'This will be added to the title of <strong>all</strong> bookings below this level of activity', ),
@@ -2992,10 +2992,10 @@ class timetables extends frontControllerApplication
 	private function updateAreasOfActivityPeopleLists ()
 	{
 		# Get the available lists and obtain the data from each upstream source
-		$supportedLists = $this->parseUserListSetting (true);
+		$supportedListsWithUsers = $this->parseUserListSetting (true);
 		
 		# End if error occurred, to avoid a working but slightly outdated list set being wiped out; the retrieval failure will have been notified
-		if ($supportedLists === false) {return;}
+		if ($supportedListsWithUsers === false) {return;}
 		
 		# Clear people list data for any entries that no longer have a list definition
 		$query = 'UPDATE areaOfActivity SET listsPeople = NULL WHERE lists IS NULL;';
@@ -3015,7 +3015,7 @@ class timetables extends frontControllerApplication
 			# Loop through each list and obtain the usernames, and order them, then register them
 			$listIds = explode ('|', trim ($lists, '|'));
 			foreach ($listIds as $listId) {
-				$usernames = $supportedLists[$listId]['usernames'];
+				$usernames = $supportedListsWithUsers[$listId]['usernames'];
 				sort ($usernames);		// Sorted within each list, but not overall
 				$listsPeople = array_merge ($listsPeople, $usernames);
 			}
