@@ -1,0 +1,2 @@
+# Every 5 minutes, refresh lists/aliases
+*/5 * * * *  www-data  php /path/to/timetables/index.html cron
