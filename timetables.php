@@ -2963,7 +2963,7 @@ class timetables extends frontControllerApplication
 		$lists = array ();
 		$csv = explode ("\n", trim ($this->settings['listUrls']));
 		foreach ($csv as $row) {
-			list ($id, $label, $field, $url) = explode (',', trim ($row));
+			list ($id, $label, $field, $url) = explode (',', trim ($row), 4);	// explode limited to 4 components as $url may contain commas
 			$lists[$id] = array (
 				'label' => $label,
 				'url' => str_replace ('%apiUsername', $this->settings['apiUsername'], $url),
