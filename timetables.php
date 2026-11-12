@@ -2997,6 +2997,10 @@ class timetables extends frontControllerApplication
 		# End if error occurred, to avoid a working but slightly outdated list set being wiped out; the retrieval failure will have been notified
 		if ($supportedLists === false) {return;}
 		
+		# Clear people list data for any entries that no longer have a list definition
+		$query = 'UPDATE areaOfActivity SET listsPeople = NULL WHERE lists IS NULL;';
+		$this->databaseConnection->query ($query);
+		
 		# Get the lists in use in the areas of activity
 		$query = 'SELECT id,lists FROM areaOfActivity WHERE lists IS NOT NULL;';
 		$areasOfActivityLists = $this->databaseConnection->getPairs ($query);
