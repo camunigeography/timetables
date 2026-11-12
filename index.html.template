@@ -7,6 +7,12 @@ $settings = array (
 	'calendarName'			=> 'Widgets',
 );
 
+# Additional environment settings for shell context (for cron)
+if (PHP_SAPI === 'cli') {
+	$_SERVER['SERVER_ADMIN'] = 'webmaster@example.com';
+	$settings['cronUsername'] = 'cron';
+}
+
 # Run the application with the specified settings
 require_once ('vendor/autoload.php');
 new timetables ($settings);
