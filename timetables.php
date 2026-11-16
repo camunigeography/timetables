@@ -3936,7 +3936,7 @@ class timetables extends frontControllerApplication
 		foreach ($data as $key => $entry) {
 			foreach ($userFieldsPresent as $field) {
 				$tokenString = $data[$key][$field];
-				if (strlen ($tokenString)) {	// i.e. avoid value being NULL or empty
+				if (strlen ($tokenString ?? '')) {	// i.e. avoid value being NULL or empty
 					$data[$key][$field] = $usersPerTokenString[$tokenString];
 				}
 			}
